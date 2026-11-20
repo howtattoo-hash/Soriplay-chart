@@ -53,6 +53,7 @@ scripts/
   media.py              iTunes 앨범 커버 + 30초 미리듣기 조회(캐시)
   chart_data.py         곡별 속도 곡선 타임라인 계산(렌더·오디오 공용)
   render_chart.py       1080×1920 바 차트 레이스 mp4 렌더(배지·왕관·스프링)
+  make_fonts.py         굵은 글꼴(Pretendard)을 fonts/SoriSans-*.otf 로 준비
   build_audio.py        1위 곡 구간별 배경 음악 편집 + 영상에 합치기
   locales.py            11개 언어 제목·설명·해시태그·영상 문구
   upload_youtube.py     업로드 + 나라별 재생목록 + 중복 방지
