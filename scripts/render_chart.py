@@ -330,7 +330,8 @@ def render(args) -> dict:
     circ: dict[str, np.ndarray | None] = {}
     for key in tl.keys:
         artist, title = tl.labels[key]
-        meta = media.lookup(artist, title, cache_dir=args.cache_dir, want_preview=False)
+        meta = media.lookup(artist, title, cache_dir=args.cache_dir, want_preview=False,
+                            market=country)
         path = meta.get("art_path")
         # figimage는 픽셀 1:1로 그리므로 영상에 들어갈 크기 그대로 만든다.
         circ[key] = media.circular_image(path, size=THUMB_PX)

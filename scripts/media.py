@@ -24,7 +24,34 @@ from PIL import Image, ImageDraw
 ITUNES_SEARCH = "https://itunes.apple.com/search"
 UA = "Mozilla/5.0 (X11; Linux x86_64) SoriPlayChartBot/1.0"
 _LAST_CALL = [0.0]
+_FAILED = [0]      # 이번 lookup 에서 통신 실패(429 등)가 있었는지 세는 카운터
 MIN_INTERVAL = 1.2  # iTunes 검색 호출 간 최소 간격(초)
+
+# 차트 시장 스토어프런트에서 못 찾았을 때 이어서 볼 상점(미국 → 한국).
+MARKET_FALLBACKS = ("US", "KR")
+
+
+def storefronts(market: str | None, has_hangul: bool = False) -> list[str]:
+    """검색할 iTunes 스토어프런트 순서.
+
+    차트 시장(예: ph) → (한글이면 KR 먼저) → US → KR.
+    iTunes Search API의 country 파라미터는 두 글자 국가 코드(PH·GB·BR…)를 받는다.
+    'global' 처럼 상점이 없는 시장은 US 로 본다.
+    """
+    out: list[str] = []
+
+    def add(code: str | None) -> None:
+        code = (code or "").strip().upper()
+        if len(code) == 2 and code.isalpha() and code not in out:
+            out.append(code)
+
+    if has_hangul:
+        add("KR")
+    if (market or "").strip().lower() not in ("", "global", "ww", "world"):
+        add(market)
+    for code in MARKET_FALLBACKS:
+        add(code)
+    return out or ["US"]
 
 
 # --------------------------------------------------------------------------- #
@@ -98,6 +125,7 @@ def itunes_search(term: str, limit: int = 10, country: str | None = None) -> lis
         except Exception as exc:  # noqa: BLE001
             print(f"[media] iTunes 검색 실패({attempt}/3): {exc}")
             time.sleep(1.5 * attempt)
+    _FAILED[0] += 1
     return []
 
 
@@ -106,6 +134,19 @@ def itunes_search(term: str, limit: int = 10, country: str | None = None) -> lis
 # --------------------------------------------------------------------------- #
 def _cache_key(artist: str, title: str) -> str:
     return hashlib.sha1(f"{_norm(artist)}|{core_title(title)}".encode()).hexdigest()[:16]
+
+
+def _artist_strong(a: str, b: str) -> bool:
+    """아티스트명이 사실상 같은 이름인가(단어 하나만 겹치는 오탐을 막는다)."""
+    na, nb = _norm(a), _norm(b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    if na in nb or nb in na:
+        shorter = na if len(na) <= len(nb) else nb
+        return len(shorter) >= 4
+    return False
 
 
 def _pick(results: list[dict], artist: str, title: str,
@@ -131,7 +172,10 @@ def _pick(results: list[dict], artist: str, title: str,
         t = _sim(want_t, core_title(name))
         a = _artist_sim(artist, r.get("artistName", ""))
         if trust_title_search:
-            if a >= 0.6:
+            # 아티스트가 사실상 같고 제목도 어느 정도 맞으면 통과.
+            # 제목이 완전히 달라도(한글↔영문) 아티스트가 같은 이름일 때만 받아준다.
+            if a >= 0.6 and (t >= 0.45 or (_artist_strong(artist, r.get("artistName", ""))
+                                           and t >= 0.12)):
                 score = 0.35 + 0.45 * a + 0.20 * t
             elif title_only and t >= 0.95:
                 score = 0.66          # 음차 표기 아티스트명 - 제목이 같으면 인정
@@ -149,45 +193,61 @@ def _pick(results: list[dict], artist: str, title: str,
 
 
 def lookup(artist: str, title: str, cache_dir: str = "cache",
-           want_preview: bool = True) -> dict:
-    """곡 하나의 커버/미리듣기 경로를 반환. 못 찾으면 빈 dict."""
+           want_preview: bool = True, market: str | None = None) -> dict:
+    """곡 하나의 커버/미리듣기 경로를 반환. 못 찾으면 빈 dict.
+
+    market: 차트 시장 코드(ph·gb·br…). 그 나라 스토어프런트를 먼저 뒤지고,
+    없으면 US·KR 까지 본다(한 나라 상점에만 있는 곡 때문에 무음이 생기던 문제).
+    """
     key = _cache_key(artist, title)
     meta_path = os.path.join(cache_dir, "meta", f"{key}.json")
     os.makedirs(os.path.dirname(meta_path), exist_ok=True)
     os.makedirs(os.path.join(cache_dir, "art"), exist_ok=True)
     os.makedirs(os.path.join(cache_dir, "preview"), exist_ok=True)
 
+    # 한글 제목은 미국/한국 스토어프런트 결과가 달라서 둘 다 모아놓고 가장 비슷한 것을 고른다.
+    has_hangul = bool(re.search(r"[\uac00-\ud7a3]", f"{artist} {title}"))
+    has_nonlatin = bool(re.search(r"[^\x00-\x7f]", f"{artist} {title}"))
+    stores = storefronts(market, has_hangul)
+    sig = ",".join(stores)
+
     if os.path.exists(meta_path):
         try:
             meta = json.load(open(meta_path, encoding="utf-8"))
-            if "not_found" in meta and meta["not_found"]:
-                return {}
-            art = meta.get("art_path")
-            prev = meta.get("preview_path")
-            have_art = bool(art) and os.path.exists(art)
-            have_prev = (not want_preview) or (bool(prev) and os.path.exists(prev))
-            if have_art and have_prev:
-                return meta
+            # 예전 실행이 다른 스토어프런트만 보고 남긴 결과는 이번 시장 기준으로 다시 찾는다.
+            same_stores = meta.get("stores") == sig
+            if meta.get("not_found"):
+                if same_stores:
+                    return {}
+            else:
+                art = meta.get("art_path")
+                prev = meta.get("preview_path")
+                have_art = bool(art) and os.path.exists(art)
+                have_prev = (not want_preview) or (bool(prev) and os.path.exists(prev))
+                if have_art and have_prev:
+                    return meta
         except (json.JSONDecodeError, OSError):
             pass
 
-    # 한글 제목은 미국/한국 스토어프런트 결과가 달라서 둘 다 모아놓고 가장 비슷한 것을 고른다.
-    has_hangul = bool(re.search(r"[\uac00-\ud7a3]", f"{artist} {title}"))
     queries = [(f"{artist} {core_title(title)}".strip(), True, False),
                (f"{artist} {title}".strip(), True, False),
-               (f"{core_title(title)}".strip() or title.strip(), True, True),
+               # 제목만 검색은 로마자 표기가 다른 경우(한글·태국어 등)에만 봐준다.
+               # (영문 곡에서 같은 제목의 남의 곡을 가져오는 오탐 방지)
+               (f"{core_title(title)}".strip() or title.strip(), True, has_nonlatin),
                (artist, False, False)]
     pool: dict[str, dict] = {}
     hit, score = None, 0.0
     calls = 0
+    failed_before = _FAILED[0]
     for q, trust, title_only in queries:
-        if not q or calls >= 6:
+        if not q or calls >= 9:
             continue
-        for store in ([None, "KR"] if has_hangul else [None]):
-            if calls >= 6:
+        for store in stores:
+            if calls >= 9:
                 break
             calls += 1
             for r in itunes_search(q, limit=10, country=store):
+                r.setdefault("__store", store)
                 key_id = str(r.get("trackId") or r.get("artworkUrl100") or r.get("trackName"))
                 pool.setdefault(key_id, r)
         if pool:
@@ -195,15 +255,24 @@ def lookup(artist: str, title: str, cache_dir: str = "cache",
                                trust_title_search=trust, title_only=title_only)
         if hit and score >= 0.72:
             break
-    if not hit:
-        json.dump({"not_found": True, "artist": artist, "title": title},
+    if not hit or score < 0.55:
+        transient = _FAILED[0] > failed_before
+        if transient or hit:
+            # 통신 오류로 못 찾은 것을 '없는 곡'으로 굳히지 않는다(다음 실행에 다시 시도).
+            print(f"[media] 커버 못 찾음: {artist} - {title} (상점 {sig})"
+                  + (" · 통신 오류로 이번만 건너뜀" if transient else "")
+                  + (f" · 가장 비슷한 후보 {hit.get('artistName')} - {hit.get('trackName')}"
+                     f"({score:.2f}) 라서 버림" if hit and not transient else ""))
+            return {}
+        json.dump({"not_found": True, "artist": artist, "title": title, "stores": sig},
                   open(meta_path, "w", encoding="utf-8"), ensure_ascii=False)
-        print(f"[media] 커버 못 찾음: {artist} - {title}")
+        print(f"[media] 커버 못 찾음: {artist} - {title} (상점 {sig})")
         return {}
 
     meta = {"artist": artist, "title": title, "score": round(score, 3),
             "matched_title": hit.get("trackName"), "matched_artist": hit.get("artistName"),
-            "album": hit.get("collectionName")}
+            "album": hit.get("collectionName"), "stores": sig,
+            "store": (hit.get("__store") or "")}
 
     art_url = (hit.get("artworkUrl100") or "").replace("100x100bb", "600x600bb")
     art_path = os.path.join(cache_dir, "art", f"{key}.jpg")

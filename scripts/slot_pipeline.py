@@ -169,10 +169,20 @@ def cmd_finish(args) -> int:
     final = slot["final"]
     audio_args = argparse.Namespace(video=joined, timeline=timeline, out=final,
                                     cache_dir="cache", mode=os.environ.get("AUDIO_MODE", "preview"),
-                                    gain=0.55)
+                                    market=slot["country"], gain=0.55)
     out_path = build_audio.build(audio_args)
     if os.path.abspath(out_path) != os.path.abspath(final):
         shutil.move(out_path, final)
+
+    # 呺음 구간·음량 검사 — 실패하면 올릴 수 있는 상태가 아니다.
+    audio_rep = {}
+    audio_json = os.path.splitext(final)[0] + ".audio.json"
+    if os.path.exists(audio_json):
+        with open(audio_json, encoding="utf-8") as fh:
+            audio_rep = json.load(fh)
+    elif audio_args.mode == "preview":
+        audio_rep = {"verified": build_audio.verify(final, float(slot["duration"]),
+                                                    "완성본")}
 
     with open(timeline, encoding="utf-8") as fh:
         info = json.load(fh)
@@ -194,6 +204,11 @@ def cmd_finish(args) -> int:
         "top1_changes": len(info.get("segments") or []),
         "duration": info.get("duration"),
         "size_mb": round(os.path.getsize(final) / 1e6, 2) if os.path.exists(final) else 0,
+        "audio": {"verified": audio_rep.get("verified"),
+                  "silent_segments": audio_rep.get("silent_segments"),
+                  "substituted": audio_rep.get("substituted"),
+                  "market": audio_rep.get("market"),
+                  "segments": audio_rep.get("segments")},
     }
     with open(os.path.join("output", "summary.json"), "w", encoding="utf-8") as fh:
         json.dump({"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -205,6 +220,11 @@ def cmd_finish(args) -> int:
     if os.path.exists(SLOT_FILE):
         os.remove(SLOT_FILE)
     print(f"[slot] 완성: {final} ({result['size_mb']}MB) · 1위 {result['top1']}")
+    aud = result.get("audio") or {}
+    if aud.get("verified"):
+        print(f"[slot] 오디오 검사 통과: {aud['verified']['duration']:.2f}s · "
+              f"평균 {aud['verified']['mean_db']} dB · 무음 {aud['verified']['silence_total']}s "
+              f"· 대체곡 {aud.get('substituted') or 0}구간 · 무음구간 {aud.get('silent_segments') or 0}")
     print(f"[slot] 요약: output/summary.json → 다음: upload_youtube.py --summary output/summary.json")
     return 0
 

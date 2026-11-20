@@ -239,6 +239,11 @@ python3 scripts/upload_youtube.py --summary output/summary.json
 - **음악 저작권**: 배경 음악은 각 곡의 **30초 미리듣기**다(45초 구간은 자동 루프·페이드).
   업로드 후 YouTube Content ID 청구(수익 배분·일부 국가 차단)가 붙을 수 있다. 청구가 싫으면
   `--audio silent`(또는 `off`)로 돌리면 된다.
+- **무음 구간 없음**: 미리듣기는 그 나라 스토어프런트(`market`, 예: `ph`) → US → KR 순으로
+  찾는다. 1위 곡에 미리듣기가 없으면 같은 시점 순위(#2, #3 …) 중 미리듣기가 있는 곡으로
+  자동 대체하고, 합친 뒤 `build_audio.py`가 `silencedetect`/`volumedetect`로 전체 길이의 소리를
+  다시 검사한다. 1.5초 이상 무음이 있거나 평균 음량이 -45dB 미만이면 그 영상은 내보내지 않는다
+  (`output/*.audio.json`에 구간별 사용 곡과 검사 결과가 남는다).
 - **이미지/폰트**: Actions 러너에 다국어 폰트를 설치해 한글·태국어·아랍어가 깨지지 않는다.
 - 산출물은 세로 9:16 · 45초라 YouTube Shorts 조건(60초 이하)을 만족한다.
 
