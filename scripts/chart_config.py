@@ -62,3 +62,52 @@ def csv_path(data_dir: str, code: str, period: str) -> str:
 
 def chart_url(code: str, period: str) -> str:
     return f"https://kworb.net/spotify/country/{code}_{period}.html"
+
+
+# --------------------------------------------------------------------------- #
+# 날짜 표기 — 연·월을 항상 함께 보여준다
+#   예전 표기: 11.12–11.18 / 11/12  (연도가 없어 어느 해 차트인지 알 수 없었다)
+#   지금 표기: 2026.11.12–11.18 / 2026/11/12
+# --------------------------------------------------------------------------- #
+def _sep_of(fmt: str) -> str:
+    """date_fmt/week_fmt 에서 구분자(/, ., -)를 뽑는다."""
+    for ch in ("/", ".", "-"):
+        if ch in fmt:
+            return ch
+    return "."
+
+
+def _day_first(fmt: str) -> bool:
+    """'%d.%m' 처럼 일이 앞에 오는 표기인지."""
+    d, m = fmt.find("%d"), fmt.find("%m")
+    return d != -1 and (m == -1 or d < m)
+
+
+def date_label(d, fmt: str) -> str:
+    """날짜 하나를 연·월·일까지 표기한다.
+
+    월 우선(예: %m/%d) → 2026/11/12 , 일 우선(예: %d.%m) → 12.11.2026
+    """
+    sep = _sep_of(fmt)
+    if _day_first(fmt):
+        return f"{d.day:02d}{sep}{d.month:02d}{sep}{d.year}"
+    return f"{d.year}{sep}{d.month:02d}{sep}{d.day:02d}"
+
+
+def week_label(start, end, fmt: str, sep: str = "–") -> str:
+    """주간 범위를 연·월과 함께 표기한다.
+
+    시작은 연·월·일 전부, 끝은 같은 달이면 월.일, 달이 바뀌면 월.일,
+    해가 바뀌면 연도까지 붙인다.
+      2026.11.12–11.18 · 2026.11.28–12.04 · 2026.12.29–2027.01.04
+      (일 우선) 12.11.2026–18.11 · 28.11.2026–04.12 · 29.12.2026–04.01.2027
+    """
+    ch = _sep_of(fmt)
+    first = date_label(start, fmt)
+    if end.year != start.year:
+        last = date_label(end, fmt)
+    elif _day_first(fmt):
+        last = f"{end.day:02d}{ch}{end.month:02d}"
+    else:
+        last = f"{end.month:02d}{ch}{end.day:02d}"
+    return f"{first}{sep}{last}"

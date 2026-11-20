@@ -6,7 +6,9 @@
 
 - 14개 시장: `global` `kr` `us` `gb` `br` `mx` `id` `vn` `th` `ph` `my` `sa` `in` `tr`
 - 45초 · 1080×1920 · 30fps · H.264(yuv420p) — 쇼츠 60초 제한 안
-- 헤더에 **주간 범위(11.12 – 11.18)** 와 **날짜 티커(11.15 · 4/7)** 가 있어 하루씩 흐르는 것이 바로 보임
+- 헤더에 **주간 범위(2026.11.12 – 11.18)** 와 **날짜 티커(11/15)** 가 있어 하루씩 흐르는 것이 바로 보임
+- 날짜는 **연·월을 함께** 표기한다(제목·설명·영상 헤더 모두). 달이나 해가 넘어가면 끝 날짜에도 붙는다
+  (`2026.11.28–12.04`, `2026.12.29–2027.01.04`)
 - 주간 차트는 **7일치로 펼쳐서** 그린다: 날마다 막대가 차오르고, 그 사이에 1위가 바뀌기도 한다
 - 막대 왼쪽에 **원형 앨범 커버 썸네일**이 순위를 따라 함께 움직임
 - **곡마다 다른 속도 곡선**으로 자라서 막대가 서로를 **추월했다가 다시 따라잡음**
@@ -105,17 +107,21 @@ python scripts/render_chart.py --country kr --period weekly --frames-dir .previe
 
 | 시장 | 언어 | 제목 예시 |
 |---|---|---|
-| kr | ko | `A2O·RESCENE \| 스포티파이 한국 주간 차트 TOP 10 (11/12) #Shorts` |
-| global/us/gb | en | `KAROL G & Tate McRae — Spotify Global Weekly Chart Top 10 (11/12) #Shorts` |
-| br | pt | `A2O e RESCENE — Top 10 Spotify Brasil (Semanal 12/11) #Shorts` |
-| mx | es | `A2O y RESCENE — Top 10 Spotify México (Semanal 12/11) #Shorts` |
-| id | id | `A2O & RESCENE — Top 10 Spotify Indonesia (Mingguan 12/11) #Shorts` |
-| vn | vi | `A2O & RESCENE — Top 10 Spotify Việt Nam (Tuần 12/11) #Shorts` |
-| th | th | `A2O & RESCENE — Top 10 Spotify ไทย (รายสัปดาห์ 12/11) #Shorts` |
-| ph | fil | `A2O at RESCENE — Top 10 Spotify Philippines (Lingguhan 11/12) #Shorts` |
-| my | ms | `A2O & RESCENE — Top 10 Spotify Malaysia (Mingguan 12/11) #Shorts` |
-| sa | ar | `A2O وRESCENE — توب 10 سبوتيفاي السعودية (الأسبوعي 12/11) #Shorts` |
-| in | hi | `A2O और RESCENE — Spotify भारत साप्ताहिक टॉप 10 (12/11) #Shorts` |
+| kr | ko | `A2O·RESCENE \| 스포티파이 한국 주간 차트 TOP 10 (2026.11.12–11.18) #Shorts` |
+| global/us/gb | en | `KAROL G & Tate McRae — Spotify Global Weekly Chart Top 10 (2026.11.12–11.18) #Shorts` |
+| br | pt | `A2O e RESCENE — Top 10 Spotify Brasil (Semanal 12.11.2026–18.11) #Shorts` |
+| mx | es | `A2O y RESCENE — Top 10 Spotify México (Semanal 12.11.2026–18.11) #Shorts` |
+| id | id | `A2O & RESCENE — Top 10 Spotify Indonesia (Mingguan 12.11.2026–18.11) #Shorts` |
+| vn | vi | `A2O & RESCENE — Top 10 Spotify Việt Nam (Tuần 12.11.2026–18.11) #Shorts` |
+| th | th | `A2O & RESCENE — Top 10 Spotify ไทย (รายสัปดาห์ 12.11.2026–18.11) #Shorts` |
+| ph | fil | `A2O at RESCENE — Top 10 Spotify Philippines (Lingguhan 2026.11.12–11.18) #Shorts` |
+| my | ms | `A2O & RESCENE — Top 10 Spotify Malaysia (Mingguan 12.11.2026–18.11) #Shorts` |
+| sa | ar | `A2O وRESCENE — توب 10 سبوتيفاي السعودية (الأسبوعي 12.11.2026–18.11) #Shorts` |
+| in | hi | `A2O और RESCENE — Spotify भारत साप्ताहिक टॉप 10 (12.11.2026–18.11) #Shorts` |
+| tr | tr | `A2O & RESCENE — Spotify Türkiye Haftalık Liste • İlk 10 (12.11.2026–18.11) #Shorts` |
+
+- 날짜 표기는 나라 순서를 따른다: 월·일 우선 시장은 `2026.11.12–11.18`, 일·월 우선 시장은 `12.11.2026–18.11`.
+- 제목이 100자를 넘으면 날짜·`#Shorts`는 그대로 두고 **아티스트 이름만 줄여서** 맞춘다.
 
 - 제목 맨 앞은 **이번 주 1위·2위 아티스트** 이름이다(조회수에 가장 큰 영향).
 - 설명에는 그 나라 말 소개 + TOP 5 + **Google Play 링크**

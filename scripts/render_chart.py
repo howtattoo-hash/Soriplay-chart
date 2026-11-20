@@ -359,8 +359,9 @@ def render(args) -> dict:
         fig.text(0.400, 0.928, f"·  {score_badge}", color="#FBBF24",
                  fontsize=14, fontweight="bold", fontfamily=fam(True), va="center")
     week_start, week_end = tl.dates[0], tl.dates[-1]
-    fig.text(0.930, 0.928,
-             f"{week_start.strftime(cfg['date_fmt'])} – {week_end.strftime(cfg['date_fmt'])}",
+    # 연·월을 함께: 2026.11.12 – 11.18 (해가 바뀌면 끝에도 연도)
+    week_txt = chart_config.week_label(week_start, week_end, cfg["week_fmt"], sep="  –  ")
+    fig.text(0.930, 0.928, week_txt,
              color=DIM, fontsize=15.5, fontweight="bold", fontfamily=fam(False),
              va="center", ha="right")
 

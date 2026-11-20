@@ -220,7 +220,7 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
     dates = [d for d in (meta.get("dates") or []) if d]
     last = dt.date.fromisoformat(dates[-1]) if dates else dt.date.today()
     if period == "weekly":
-        # 주간 차트는 “하루”가 아니라 7일 범위로 표시한다(11.12–11.18).
+        # 주간 차트는 “하루”가 아니라 7일 범위로 표시한다(2026.11.12–11.18).
         try:
             start = dt.date.fromisoformat(meta.get("week_start") or dates[0])
             end = dt.date.fromisoformat(meta.get("week_end") or "")
@@ -228,11 +228,12 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
             start, end = last, last + dt.timedelta(days=6)
         if end <= start:
             end = start + dt.timedelta(days=6)
-        week = f"{start.strftime(cfg['week_fmt'])}–{end.strftime(cfg['week_fmt'])}"
+        # 연·월을 함께: (11.12–11.18) → (2026.11.12–11.18)
+        week = chart_config.week_label(start, end, cfg["week_fmt"])
         date_label = week
     else:
-        date_label = last.strftime(cfg["date_fmt"])
-        week = last.strftime(cfg["week_fmt"])
+        date_label = chart_config.date_label(last, cfg["date_fmt"])
+        week = chart_config.date_label(last, cfg["week_fmt"])
 
     labels = meta.get("labels") or {}
     series = meta.get("series") or {}
@@ -254,8 +255,17 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
                playstore=locales.PLAYSTORE, site=locales.SITE)
 
     title = _clean_title(loc["title"].format(**ctx))
-    if not a2:
-        title = title.replace("&  ", "").replace("·", "").replace("  ", " ")
+    # 100자가 넘으면 날짜·#Shorts를 잘라내지 말고 아티스트 이름을 줄인다.
+    limit = 26
+    while True:
+        if not ctx["a2"]:
+            title = title.replace("&  ", "").replace("·", "").replace("  ", " ")
+        if len(title) <= MAX_TITLE or limit <= 10:
+            break
+        limit -= 4
+        ctx["a1"] = _short(artist_of(ranked[0][0]), limit) if ranked else ""
+        ctx["a2"] = _short(artist_of(ranked[1][0]), limit) if len(ranked) > 1 else ""
+        title = _clean_title(loc["title"].format(**ctx))
     if len(title) > MAX_TITLE:
         title = title[:MAX_TITLE].rstrip()
 
