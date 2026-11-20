@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,my,1,SIENNA SPIRO,Great Expectation,711491,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,2,Tulus,Teh Hijau,669304,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,3,eńau,Sesi Potret (w/ Ari Lesmana),620885,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,4,Raim Laode,Iqro',524633,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,5,Katy Perry,The One That Got Away,502248,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,6,Ashe,Stop The Wedding!,489271,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,7,Gloria Jessica,Terbelah Jadi Dua (w/ Ade Govinda),483437,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,8,Mac Miller,Cinderella (w/ Ty Dolla $ign),432582,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,9,ADÉLA,Ain't In LA,426212,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,10,Olivia Rodrigo,the cure,424755,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,11,The Weeknd,"One Of The Girls (w/ JENNIE, Lily-Rose Depp)",414509,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,12,Dayang Nurfaizah,Lelaki Teragung,406202,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,13,Raim Laode,Dunia Yang Nanti,396996,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,14,Mahalini,Percuma,391525,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,15,Harry Styles,Coming Up Roses,383781,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,16,The Weeknd,Starboy (w/ Daft Punk),348568,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,17,Al-Ghazali,Amnesia,342397,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,18,The Weeknd,Die For You,341194,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,19,The Weeknd,Hong Kong,261758,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,my,20,Swedish House Mafia,Moth To A Flame (w/ The Weeknd),244499,derived_prev,2026-11-20T07:40:52Z,
+2026-11-12,my,1,SIENNA SPIRO,Great Expectation,703170,kworb,2026-11-20T07:40:52Z,
+2026-11-12,my,2,Tulus,Teh Hijau,658612,kworb,2026-11-20T07:40:52Z,
+2026-11-12,my,3,eńau,Sesi Potret (w/ Ari Lesmana),606099,kworb,2026-11-20T07:40:52Z,
+2026-11-12,my,4,Ashe,Stop The Wedding!,547425,kworb,2026-11-20T07:40:52Z,+2
+2026-11-12,my,5,Gloria Jessica,Terbelah Jadi Dua (w/ Ade Govinda),523881,kworb,2026-11-20T07:40:52Z,+2
+2026-11-12,my,6,Raim Laode,Iqro',522060,kworb,2026-11-20T07:40:52Z,-2
+2026-11-12,my,7,The Weeknd,Hong Kong,519974,kworb,2026-11-20T07:40:52Z,+43
+2026-11-12,my,8,Katy Perry,The One That Got Away,493769,kworb,2026-11-20T07:40:52Z,-3
+2026-11-12,my,9,The Weeknd,"One Of The Girls (w/ JENNIE, Lily-Rose Depp)",492887,kworb,2026-11-20T07:40:52Z,+2
+2026-11-12,my,10,Mac Miller,Cinderella (w/ Ty Dolla $ign),445058,kworb,2026-11-20T07:40:52Z,-2
+2026-11-12,my,11,Olivia Rodrigo,the cure,442800,kworb,2026-11-20T07:40:52Z,-1
+2026-11-12,my,12,ADÉLA,Ain't In LA,418131,kworb,2026-11-20T07:40:52Z,-3
+2026-11-12,my,13,The Weeknd,Starboy (w/ Daft Punk),415061,kworb,2026-11-20T07:40:52Z,+11
+2026-11-12,my,14,The Weeknd,Die For You,413427,kworb,2026-11-20T07:40:52Z,+14
+2026-11-12,my,15,Al-Ghazali,Amnesia,411590,kworb,2026-11-20T07:40:52Z,+12
+2026-11-12,my,16,Harry Styles,Coming Up Roses,409955,kworb,2026-11-20T07:40:52Z,+1
+2026-11-12,my,17,Swedish House Mafia,Moth To A Flame (w/ The Weeknd),402998,kworb,2026-11-20T07:40:52Z,+38
+2026-11-12,my,18,Raim Laode,Dunia Yang Nanti,402620,kworb,2026-11-20T07:40:52Z,-5
+2026-11-12,my,19,Mahalini,Percuma,398349,kworb,2026-11-20T07:40:52Z,-4
+2026-11-12,my,20,Dayang Nurfaizah,Lelaki Teragung,396214,kworb,2026-11-20T07:40:52Z,-8

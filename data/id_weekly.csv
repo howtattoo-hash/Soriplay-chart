@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,id,1,eńau,Sesi Potret (w/ Ari Lesmana),8645805,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,2,Raim Laode,Dunia Yang Nanti,7888318,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,3,Raim Laode,Iqro',7607770,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,4,Tulus,Teh Hijau,7166848,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,5,Gloria Jessica,Terbelah Jadi Dua (w/ Ade Govinda),6495645,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,6,Al-Ghazali,Amnesia,5582633,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,7,Kahitna,Titik Nadir (w/ Monita Tahalea),5331179,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,8,Perunggu,Ini Abadi,5218733,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,9,Overnight,Kita Lewati Berdua,5078185,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,10,Raim Laode,Bersenja Gurau,5047956,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,11,Tulus,Jatuh Suka,4855383,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,12,Piche Kota,Bahagia Lagi,4637065,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,13,Nadhif Basalamah,bergema sampai selamanya,4528521,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,14,Nadhif Basalamah,kota ini tak sama tanpamu,4482847,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,15,Pamungkas,Monolog,4319776,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,16,Noah,Separuh Aku,4204556,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,17,Olivia Rodrigo,the cure,4041377,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,18,Idgitaf,Sedia Aku Sebelum Hujan,3654246,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,19,Mahalini,Sisa Rasa,3185370,derived_prev,2026-11-20T07:40:49Z,
+2026-11-05,id,20,LANY,Stuck,3061158,derived_prev,2026-11-20T07:40:49Z,
+2026-11-12,id,1,eńau,Sesi Potret (w/ Ari Lesmana),8297720,kworb,2026-11-20T07:40:49Z,
+2026-11-12,id,2,Raim Laode,Dunia Yang Nanti,7582754,kworb,2026-11-20T07:40:49Z,
+2026-11-12,id,3,Raim Laode,Iqro',7126449,kworb,2026-11-20T07:40:49Z,
+2026-11-12,id,4,Al-Ghazali,Amnesia,6742560,kworb,2026-11-20T07:40:49Z,+2
+2026-11-12,id,5,Tulus,Teh Hijau,6470050,kworb,2026-11-20T07:40:49Z,-1
+2026-11-12,id,6,Gloria Jessica,Terbelah Jadi Dua (w/ Ade Govinda),6163758,kworb,2026-11-20T07:40:49Z,-1
+2026-11-12,id,7,Kahitna,Titik Nadir (w/ Monita Tahalea),4979317,kworb,2026-11-20T07:40:49Z,
+2026-11-12,id,8,Noah,Separuh Aku,4955508,kworb,2026-11-20T07:40:49Z,+9
+2026-11-12,id,9,Tulus,Jatuh Suka,4819018,kworb,2026-11-20T07:40:49Z,+2
+2026-11-12,id,10,Raim Laode,Bersenja Gurau,4705135,kworb,2026-11-20T07:40:49Z,
+2026-11-12,id,11,LANY,Stuck,4602793,kworb,2026-11-20T07:40:49Z,+37
+2026-11-12,id,12,Pamungkas,Monolog,4393706,kworb,2026-11-20T07:40:49Z,+4
+2026-11-12,id,13,Nadhif Basalamah,bergema sampai selamanya,4389989,kworb,2026-11-20T07:40:49Z,+1
+2026-11-12,id,14,Perunggu,Ini Abadi,4376468,kworb,2026-11-20T07:40:49Z,-6
+2026-11-12,id,15,Piche Kota,Bahagia Lagi,4257123,kworb,2026-11-20T07:40:49Z,-3
+2026-11-12,id,16,Nadhif Basalamah,kota ini tak sama tanpamu,4230898,kworb,2026-11-20T07:40:49Z,-1
+2026-11-12,id,17,Overnight,Kita Lewati Berdua,4144991,kworb,2026-11-20T07:40:49Z,-8
+2026-11-12,id,18,Olivia Rodrigo,the cure,4004244,kworb,2026-11-20T07:40:49Z,+4
+2026-11-12,id,19,Mahalini,Sisa Rasa,3943061,kworb,2026-11-20T07:40:49Z,+22
+2026-11-12,id,20,Idgitaf,Sedia Aku Sebelum Hujan,3934883,kworb,2026-11-20T07:40:49Z,+7

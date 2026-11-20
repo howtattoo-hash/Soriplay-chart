@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,us,1,Tate McRae,Housewife,8633171,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,2,ADÉLA,Nicole Kidman,7250032,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,3,Ella Langley,Choosin' Texas,7214178,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,4,KAROL G,"BbY WOW (w/ Judeline, rusowsky)",5309776,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,5,The Killers,Mr. Brightside,5111735,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,6,Malcolm Todd,Earrings,4988608,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,7,Olivia Rodrigo,the cure,4833507,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,8,Olivia Rodrigo,stupid song,4795341,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,9,Ashe,Stop The Wedding!,4644140,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,10,Whiskey Myers,Broken Window Serenade,4436396,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,11,ADÉLA,Ain't In LA,4163983,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,12,Olivia Dean,Man I Need,4073236,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,13,The Neighbourhood,Sweater Weather,3976441,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,14,Steve Lacy,nothing,3780074,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,15,Noah Kahan,Orbiter,3544246,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,16,The Goo Goo Dolls,Iris,3542017,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,17,Arctic Monkeys,505,3438523,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,18,Wham!,Last Christmas,3417949,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,19,Steve Lacy,the feeling,3409198,derived_prev,2026-11-20T07:40:46Z,
+2026-11-05,us,20,Mariah Carey,All I Want for Christmas Is You,3240015,derived_prev,2026-11-20T07:40:46Z,
+2026-11-12,us,1,Ella Langley,Choosin' Texas,7245709,kworb,2026-11-20T07:40:46Z,+2
+2026-11-12,us,2,Tate McRae,Housewife,7177040,kworb,2026-11-20T07:40:46Z,-1
+2026-11-12,us,3,ADÉLA,Nicole Kidman,6249203,kworb,2026-11-20T07:40:46Z,-1
+2026-11-12,us,4,Ashe,Stop The Wedding!,5843448,kworb,2026-11-20T07:40:46Z,+9
+2026-11-12,us,5,Olivia Rodrigo,stupid song,5267148,kworb,2026-11-20T07:40:46Z,+7
+2026-11-12,us,6,The Killers,Mr. Brightside,5199959,kworb,2026-11-20T07:40:46Z,+2
+2026-11-12,us,7,KAROL G,"BbY WOW (w/ Judeline, rusowsky)",5182535,kworb,2026-11-20T07:40:46Z,
+2026-11-12,us,8,Olivia Rodrigo,the cure,5069151,kworb,2026-11-20T07:40:46Z,+3
+2026-11-12,us,9,Malcolm Todd,Earrings,5059888,kworb,2026-11-20T07:40:46Z,
+2026-11-12,us,10,Wham!,Last Christmas,4905768,kworb,2026-11-20T07:40:46Z,+17
+2026-11-12,us,11,Steve Lacy,nothing,4596484,kworb,2026-11-20T07:40:46Z,+9
+2026-11-12,us,12,Whiskey Myers,Broken Window Serenade,4456121,kworb,2026-11-20T07:40:46Z,+2
+2026-11-12,us,13,Olivia Dean,Man I Need,4403611,kworb,2026-11-20T07:40:46Z,+4
+2026-11-12,us,14,Mariah Carey,All I Want for Christmas Is You,4363158,kworb,2026-11-20T07:40:46Z,+22
+2026-11-12,us,15,ADÉLA,Ain't In LA,4020971,kworb,2026-11-20T07:40:46Z,+1
+2026-11-12,us,16,The Neighbourhood,Sweater Weather,3950445,kworb,2026-11-20T07:40:46Z,+2
+2026-11-12,us,17,Noah Kahan,Orbiter,3944516,kworb,2026-11-20T07:40:46Z,+6
+2026-11-12,us,18,Steve Lacy,the feeling,3888196,kworb,2026-11-20T07:40:46Z,+10
+2026-11-12,us,19,The Goo Goo Dolls,Iris,3779724,kworb,2026-11-20T07:40:46Z,+5
+2026-11-12,us,20,Arctic Monkeys,505,3585496,kworb,2026-11-20T07:40:46Z,+6

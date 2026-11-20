@@ -1,0 +1,39 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,br,1,Felipe e Rodrigo,Pós - Ao Vivo,16065960,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,2,João Gustavo e Murilo,Postinho de Gasolina (w/ Grelo),12000617,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,3,Hugo & Guilherme,Flash (Minha Mente) 💠 (w/ Zé Vaqueiro),7512903,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,4,Netto Brito,Mega Hair - Ao Vivo (w/ Luan Pereira),6685615,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,5,Zé Neto & Cristiano,Cadeira Cativa - Ao Vivo,6485144,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,6,MC Leozinho ZS,"Ta Pedindo Toma (w/ MC Murilo MT, Mc DR, DJ JHOW BEATS, MC RN do Capão, Mc Pelourinho)",6023301,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,7,Felipe e Rodrigo,Ignora (Ao Vivo),5939054,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,8,Hugo & Guilherme,Flash - Ao Vivo,5852936,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,9,MC Jvila,"Geme Baixo (w/ Menor MC, Honaiser, DJ Dael, DJ JOÃO PEREIRA, G.A, Galdino)",5760807,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,10,NATTAN,Aproveita Que Eu Tô Brigado - Ao Vivo (w/ Zé Vaqueiro),5175570,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,11,Danilo e Davi,Eu Não Sou Terapia - Ao Vivo,4936176,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,12,Oldilla,"Cuida do Pet (w/ Mc Iguinho Ct, MC Willian, Aaron Modesto, Mc Negão Original, DU'L, Dj Aladin GDB)",4790810,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,13,Panda,Eu Te Seguro - Ao Vivo (w/ MJ Records),4750579,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,14,MC Jvila,"Puxa o Lança (w/ KayBlack, Veigh, Vulgo FK, Honaiser, Nagalli, Stick, Toledo)",4652435,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,15,CountryBeat,Um Peão Desse (w/ Mari Fernandez),4549161,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,16,MC Jvila,"EXAGERADO (w/ MC Meno K, Mc Rodrigo do CN, DJ Glenner)",4377277,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,17,Jeninho,Peão Todo Tatuado (w/ Mariana Fagundes),4303121,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,br,18,Mc Jacaré,"Pau Pra Toda Obra (w/ MC Ryan SP, Mc Lele JP, Mc IG)",4193076,derived_prev,2026-11-20T07:40:47Z,
+2026-11-12,br,1,Felipe e Rodrigo,Pós - Ao Vivo,14926400,kworb,2026-11-20T07:40:47Z,
+2026-11-12,br,2,João Gustavo e Murilo,Postinho de Gasolina (w/ Grelo),10722240,kworb,2026-11-20T07:40:47Z,
+2026-11-12,br,3,MC Jvila,"Geme Baixo (w/ Menor MC, Honaiser, DJ Dael, DJ JOÃO PEREIRA, G.A, Galdino)",6639789,kworb,2026-11-20T07:40:47Z,+6
+2026-11-12,br,4,Hugo & Guilherme,Flash - Ao Vivo,6198351,kworb,2026-11-20T07:40:47Z,+4
+2026-11-12,br,5,Netto Brito,Mega Hair - Ao Vivo (w/ Luan Pereira),5923708,kworb,2026-11-20T07:40:47Z,-1
+2026-11-12,br,6,Hugo & Guilherme,Flash (Minha Mente) 💠 (w/ Zé Vaqueiro),5847209,kworb,2026-11-20T07:40:47Z,-3
+2026-11-12,br,7,Felipe e Rodrigo,Eu Me Rendo - Ao Vivo,5713157,kworb,2026-11-20T07:40:47Z,NEW
+2026-11-12,br,8,Zé Neto & Cristiano,Cadeira Cativa - Ao Vivo,5698979,kworb,2026-11-20T07:40:47Z,-3
+2026-11-12,br,9,Danilo e Davi,Eu Não Sou Terapia - Ao Vivo,5438189,kworb,2026-11-20T07:40:47Z,+2
+2026-11-12,br,10,MC Leozinho ZS,"Ta Pedindo Toma (w/ MC Murilo MT, Mc DR, DJ JHOW BEATS, MC RN do Capão, Mc Pelourinho)",5255055,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,br,11,Felipe e Rodrigo,Ignora (Ao Vivo),5008015,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,br,12,NATTAN,Aproveita Que Eu Tô Brigado - Ao Vivo (w/ Zé Vaqueiro),4863623,kworb,2026-11-20T07:40:47Z,-2
+2026-11-12,br,13,MC Jvila,"Puxa o Lança (w/ KayBlack, Veigh, Vulgo FK, Honaiser, Nagalli, Stick, Toledo)",4849780,kworb,2026-11-20T07:40:47Z,+1
+2026-11-12,br,14,Oldilla,"Cuida do Pet (w/ Mc Iguinho Ct, MC Willian, Aaron Modesto, Mc Negão Original, DU'L, Dj Aladin GDB)",4387645,kworb,2026-11-20T07:40:47Z,-2
+2026-11-12,br,15,Panda,Eu Te Seguro - Ao Vivo (w/ MJ Records),4367826,kworb,2026-11-20T07:40:47Z,-2
+2026-11-12,br,16,Felipe e Rodrigo,Fala Pra Sua Saudade - Ao Vivo,4252898,kworb,2026-11-20T07:40:47Z,NEW
+2026-11-12,br,17,Jeninho,Peão Todo Tatuado (w/ Mariana Fagundes),3927615,kworb,2026-11-20T07:40:47Z,
+2026-11-12,br,18,Mc Jacaré,"Pau Pra Toda Obra (w/ MC Ryan SP, Mc Lele JP, Mc IG)",3894861,kworb,2026-11-20T07:40:47Z,
+2026-11-12,br,19,CountryBeat,Um Peão Desse (w/ Mari Fernandez),3871788,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,br,20,MC Jvila,"EXAGERADO (w/ MC Meno K, Mc Rodrigo do CN, DJ Glenner)",3857830,kworb,2026-11-20T07:40:47Z,-4

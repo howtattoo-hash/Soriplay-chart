@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,mx,1,Fuerza Regida,Suzuki (from GTAVI: The Album) (w/ Grand Theft Auto VI),10303456,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,2,KAROL G,"BbY WOW (w/ Judeline, rusowsky)",8845940,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,3,Natanael Cano,"OLIVIA LA FLAKA (w/ Tito Double P, Victor Mendivil, Ovi)",6845735,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,4,Neton Vega,RIKI,6654134,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,5,Neton Vega,Olimpo (w/ Fuerza Regida),6520193,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,6,Victor Mendivil,Cansada (w/ Victoria Mendivil),6005396,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,7,Neton Vega,Nalguita y Teta,5737244,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,8,Omar Camacho,King of Watches,5516698,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,9,LOS DOS DE TAMAULIPAS,Ayúdame,5301671,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,10,Junior H,DEMENCIA (w/ Gael Valenzuela),4939356,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,11,El Rabbanito,Dandy Hats,4586719,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,12,Neton Vega,Pvta Luna,4576624,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,13,Fuerza Regida,caperuza,4278037,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,14,El Bogueto,"Cuando No Era Cantante RMX - Remix (w/ Anuel AA, Fuerza Regida, Yung Beef)",4012018,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,15,Victor Mendivil,FES (w/ Omar Camacho),3983457,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,16,Lenin Ramírez,Todo Lo Fue,3967698,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,17,Natanael Cano,Mar Azul,3965028,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,18,Victor Mendivil,Gané (w/ Gabito Ballesteros),3654739,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,19,Omar Camacho,2+2 (w/ Victor Mendivil),3620808,derived_prev,2026-11-20T07:40:48Z,
+2026-11-05,mx,20,Lenin Ramírez,Polvo Rosita,3575298,derived_prev,2026-11-20T07:40:48Z,
+2026-11-12,mx,1,Fuerza Regida,Suzuki (from GTAVI: The Album) (w/ Grand Theft Auto VI),9711019,kworb,2026-11-20T07:40:48Z,
+2026-11-12,mx,2,KAROL G,"BbY WOW (w/ Judeline, rusowsky)",8702332,kworb,2026-11-20T07:40:48Z,
+2026-11-12,mx,3,Neton Vega,Olimpo (w/ Fuerza Regida),7688497,kworb,2026-11-20T07:40:48Z,+2
+2026-11-12,mx,4,Neton Vega,RIKI,6428834,kworb,2026-11-20T07:40:48Z,
+2026-11-12,mx,5,Natanael Cano,"OLIVIA LA FLAKA (w/ Tito Double P, Victor Mendivil, Ovi)",6269891,kworb,2026-11-20T07:40:48Z,-2
+2026-11-12,mx,6,Neton Vega,Nalguita y Teta,5374908,kworb,2026-11-20T07:40:48Z,+1
+2026-11-12,mx,7,Omar Camacho,King of Watches,5338691,kworb,2026-11-20T07:40:48Z,+1
+2026-11-12,mx,8,Victor Mendivil,Cansada (w/ Victoria Mendivil),5324525,kworb,2026-11-20T07:40:48Z,-2
+2026-11-12,mx,9,Neton Vega,Pvta Luna,4918838,kworb,2026-11-20T07:40:48Z,+3
+2026-11-12,mx,10,LOS DOS DE TAMAULIPAS,Ayúdame,4797321,kworb,2026-11-20T07:40:48Z,-1
+2026-11-12,mx,11,Junior H,DEMENCIA (w/ Gael Valenzuela),4657353,kworb,2026-11-20T07:40:48Z,-1
+2026-11-12,mx,12,El Bogueto,"Cuando No Era Cantante RMX - Remix (w/ Anuel AA, Fuerza Regida, Yung Beef)",4258050,kworb,2026-11-20T07:40:48Z,+2
+2026-11-12,mx,13,El Rabbanito,Dandy Hats,4029849,kworb,2026-11-20T07:40:48Z,-2
+2026-11-12,mx,14,Lenin Ramírez,Todo Lo Fue,4006849,kworb,2026-11-20T07:40:48Z,+2
+2026-11-12,mx,15,Fuerza Regida,caperuza,4002572,kworb,2026-11-20T07:40:48Z,-2
+2026-11-12,mx,16,Victor Mendivil,Gané (w/ Gabito Ballesteros),3946171,kworb,2026-11-20T07:40:48Z,+4
+2026-11-12,mx,17,Natanael Cano,Mar Azul,3755841,kworb,2026-11-20T07:40:48Z,
+2026-11-12,mx,18,Omar Camacho,2+2 (w/ Victor Mendivil),3693539,kworb,2026-11-20T07:40:48Z,+3
+2026-11-12,mx,19,Lenin Ramírez,Polvo Rosita,3623378,kworb,2026-11-20T07:40:48Z,+4
+2026-11-12,mx,20,Victor Mendivil,FES (w/ Omar Camacho),3543575,kworb,2026-11-20T07:40:48Z,-5

@@ -384,6 +384,9 @@ def main() -> None:
             print(f"[youtube] {args.summary} 가 없습니다.", file=sys.stderr)
             return
         for res in summary.get("results") or []:
+            if res.get("skipped"):
+                print(f"[youtube] {res.get('country')} 건너뜀({res['skipped']})")
+                continue
             meta_path = res.get("timeline") or os.path.splitext(res.get("video", ""))[0] + ".json"
             if not os.path.exists(meta_path):
                 continue

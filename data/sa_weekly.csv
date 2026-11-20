@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,sa,1,Sabah Mahmod,عفتني,108612,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,2,TUL8TE,Garee2a Awy - A COLORS SHOW (w/ COLORS),101414,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,3,Aws Al Saber,شلون بية,97656,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,4,Ayed,اوعدك,96139,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,5,Cairokee,Tata Tata,83867,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,6,Marwan Pablo,"Shoft Kalam (w/ Lege-Cy, HatemBas)",81200,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,7,Louay Adnan,اريدك,78917,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,8,Raad And Methaq,مهموم,74576,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,9,Tate McRae,Housewife,74275,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,10,Evanescence,Bring Me To Life,72636,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,11,Ramy Sabry,الحب عيبنا,71767,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,12,Ramy Sabry,Kelma,70934,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,13,Ravyn Lenae,Love Me Not,70292,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,14,Katy Perry,The One That Got Away,64100,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,15,Sabah Mahmod,ميت اني,63120,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,16,علي حاتم,ارجع علينا,62645,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,17,Ayed,لماح,62056,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,18,The Neighbourhood,Sweater Weather,61374,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,19,Gigi Perez,Sailor Song,55372,derived_prev,2026-11-20T07:40:53Z,
+2026-11-05,sa,20,Mahmoud Al Turky,Habibi Howa,41864,derived_prev,2026-11-20T07:40:53Z,
+2026-11-12,sa,1,Sabah Mahmod,عفتني,107142,kworb,2026-11-20T07:40:53Z,
+2026-11-12,sa,2,TUL8TE,Garee2a Awy - A COLORS SHOW (w/ COLORS),87753,kworb,2026-11-20T07:40:53Z,
+2026-11-12,sa,3,Ayed,اوعدك,86695,kworb,2026-11-20T07:40:53Z,+1
+2026-11-12,sa,4,Aws Al Saber,شلون بية,84520,kworb,2026-11-20T07:40:53Z,-1
+2026-11-12,sa,5,Cairokee,Tata Tata,79288,kworb,2026-11-20T07:40:53Z,
+2026-11-12,sa,6,Louay Adnan,اريدك,74175,kworb,2026-11-20T07:40:53Z,+1
+2026-11-12,sa,7,Ramy Sabry,Kelma,72756,kworb,2026-11-20T07:40:53Z,+5
+2026-11-12,sa,8,Marwan Pablo,"Shoft Kalam (w/ Lege-Cy, HatemBas)",72099,kworb,2026-11-20T07:40:53Z,-2
+2026-11-12,sa,9,Evanescence,Bring Me To Life,71930,kworb,2026-11-20T07:40:53Z,+1
+2026-11-12,sa,10,Raad And Methaq,مهموم,69984,kworb,2026-11-20T07:40:53Z,-2
+2026-11-12,sa,11,Mahmoud Al Turky,Habibi Howa,67368,kworb,2026-11-20T07:40:53Z,+54
+2026-11-12,sa,12,Sabah Mahmod,ميت اني,66522,kworb,2026-11-20T07:40:53Z,+5
+2026-11-12,sa,13,Ramy Sabry,الحب عيبنا,66519,kworb,2026-11-20T07:40:53Z,-2
+2026-11-12,sa,14,Ravyn Lenae,Love Me Not,65322,kworb,2026-11-20T07:40:53Z,-1
+2026-11-12,sa,15,Katy Perry,The One That Got Away,62613,kworb,2026-11-20T07:40:53Z,-1
+2026-11-12,sa,16,The Neighbourhood,Sweater Weather,60533,kworb,2026-11-20T07:40:53Z,+6
+2026-11-12,sa,17,علي حاتم,ارجع علينا,60308,kworb,2026-11-20T07:40:53Z,+1
+2026-11-12,sa,18,Tate McRae,Housewife,60261,kworb,2026-11-20T07:40:53Z,-9
+2026-11-12,sa,19,Gigi Perez,Sailor Song,59111,kworb,2026-11-20T07:40:53Z,+12
+2026-11-12,sa,20,Ayed,لماح,59072,kworb,2026-11-20T07:40:53Z,

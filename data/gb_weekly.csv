@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,gb,1,Jamie Miller,Babydoll,4191833,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,2,Tate McRae,Housewife,2984450,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,3,Ashe,Stop The Wedding!,2445318,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,4,Sam Fender,Rein Me In (w/ Olivia Dean),2359234,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,5,Olivia Dean,Man I Need,2004237,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,6,ADÉLA,Nicole Kidman,1755342,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,7,SIENNA SPIRO,Great Expectation,1726869,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,8,Ella Langley,Choosin' Texas,1479568,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,9,Olivia Rodrigo,the cure,1464050,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,10,Olivia Rodrigo,stupid song,1408927,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,11,sombr,My Body Isn't Ready,1401650,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,12,The Killers,Mr. Brightside,1282530,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,13,ADÉLA,Ain't In LA,1257367,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,14,sombr,Homewrecker,1202631,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,15,STELLA LEFTY,Boston,1134932,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,16,The Goo Goo Dolls,Iris,1084616,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,17,Noah Kahan,Willing and Able,991681,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,18,Noah Kahan,Orbiter,918140,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,19,Wham!,Last Christmas,905548,derived_prev,2026-11-20T07:40:47Z,
+2026-11-05,gb,20,Mariah Carey,All I Want for Christmas Is You,761216,derived_prev,2026-11-20T07:40:47Z,
+2026-11-12,gb,1,Jamie Miller,Babydoll,4085399,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,2,Ashe,Stop The Wedding!,2607536,kworb,2026-11-20T07:40:47Z,+1
+2026-11-12,gb,3,Tate McRae,Housewife,2477886,kworb,2026-11-20T07:40:47Z,-1
+2026-11-12,gb,4,Sam Fender,Rein Me In (w/ Olivia Dean),2311900,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,5,Olivia Dean,Man I Need,2041382,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,6,SIENNA SPIRO,Great Expectation,1751251,kworb,2026-11-20T07:40:47Z,+1
+2026-11-12,gb,7,Olivia Rodrigo,stupid song,1492491,kworb,2026-11-20T07:40:47Z,+3
+2026-11-12,gb,8,Olivia Rodrigo,the cure,1487489,kworb,2026-11-20T07:40:47Z,+1
+2026-11-12,gb,9,Wham!,Last Christmas,1462119,kworb,2026-11-20T07:40:47Z,+29
+2026-11-12,gb,10,ADÉLA,Nicole Kidman,1455742,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,gb,11,sombr,My Body Isn't Ready,1418094,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,12,Ella Langley,Choosin' Texas,1413908,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,gb,13,The Killers,Mr. Brightside,1282300,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,14,sombr,Homewrecker,1229279,kworb,2026-11-20T07:40:47Z,+2
+2026-11-12,gb,15,Mariah Carey,All I Want for Christmas Is You,1169075,kworb,2026-11-20T07:40:47Z,+43
+2026-11-12,gb,16,Noah Kahan,Willing and Able,1145585,kworb,2026-11-20T07:40:47Z,+9
+2026-11-12,gb,17,STELLA LEFTY,Boston,1142286,kworb,2026-11-20T07:40:47Z,
+2026-11-12,gb,18,ADÉLA,Ain't In LA,1139611,kworb,2026-11-20T07:40:47Z,-4
+2026-11-12,gb,19,The Goo Goo Dolls,Iris,1121158,kworb,2026-11-20T07:40:47Z,+1
+2026-11-12,gb,20,Noah Kahan,Orbiter,1079713,kworb,2026-11-20T07:40:47Z,+16

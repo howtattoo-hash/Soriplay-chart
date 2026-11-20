@@ -1,0 +1,41 @@
+chart_date,country,rank,artist,title,streams,source,fetched_at,rank_change
+2026-11-05,ph,1,SHEAN,ako ang bagyo,8789847,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,2,Mariah Deborah,Na Para Bang,8353401,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,3,Esremborak,Mahal Magmahal,6199412,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,4,Jin DC,Totoong tayo,5733447,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,5,RAPROJECT SIX,Baby 123 (w/ MADAM SAUCE),4803262,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,6,nicole,Panaginip,3803511,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,7,HELLMERRY,Summer Crush,3787425,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,8,fitterkarma,Kalapastangan,3748840,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,9,groundZERO Records,"TMA (w/ Tyler, Primera, ODP)",3687136,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,10,Kyle Raphael,Libu-Libong Buwan (Uuwian),3284162,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,11,Uncle Dags,Buenos Dias (w/ Fern.),3234601,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,12,Ashe,Stop The Wedding!,3224133,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,13,RAPROJECT SIX,Alabang,3192658,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,14,ADÉLA,Ain't In LA,2844705,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,15,Uncle Dags,Weng Weng (w/ Gaspari),2798036,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,16,fitterkarma,Pag-Ibig ay Kanibalismo II,2681615,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,17,shirebound,Pahintulot,2593712,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,18,Olivia Rodrigo,the cure,2542835,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,19,LANY,'Cause You Have To,1324200,derived_prev,2026-11-20T07:40:52Z,
+2026-11-05,ph,20,GEHLEE,Closer,1310282,derived_prev,2026-11-20T07:40:52Z,
+2026-11-12,ph,1,SHEAN,ako ang bagyo,9888811,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,2,Mariah Deborah,Na Para Bang,7820993,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,3,Esremborak,Mahal Magmahal,5697474,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,4,Jin DC,Totoong tayo,5433544,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,5,RAPROJECT SIX,Baby 123 (w/ MADAM SAUCE),4704248,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,6,Uncle Dags,Buenos Dias (w/ Fern.),4203165,kworb,2026-11-20T07:40:52Z,+5
+2026-11-12,ph,7,HELLMERRY,Summer Crush,4155826,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,8,nicole,Panaginip,3788007,kworb,2026-11-20T07:40:52Z,-2
+2026-11-12,ph,9,groundZERO Records,"TMA (w/ Tyler, Primera, ODP)",3639988,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,10,fitterkarma,Kalapastangan,3631593,kworb,2026-11-20T07:40:52Z,-2
+2026-11-12,ph,11,GEHLEE,Closer,3630357,kworb,2026-11-20T07:40:52Z,+71
+2026-11-12,ph,12,RAPROJECT SIX,Alabang,3388906,kworb,2026-11-20T07:40:52Z,+1
+2026-11-12,ph,13,Ashe,Stop The Wedding!,3132962,kworb,2026-11-20T07:40:52Z,-1
+2026-11-12,ph,14,LANY,'Cause You Have To,3020956,kworb,2026-11-20T07:40:52Z,+65
+2026-11-12,ph,15,Uncle Dags,Weng Weng (w/ Gaspari),2881952,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,16,Kyle Raphael,Libu-Libong Buwan (Uuwian),2864794,kworb,2026-11-20T07:40:52Z,-6
+2026-11-12,ph,17,shirebound,Pahintulot,2701296,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,18,Olivia Rodrigo,the cure,2694974,kworb,2026-11-20T07:40:52Z,
+2026-11-12,ph,19,fitterkarma,Pag-Ibig ay Kanibalismo II,2679048,kworb,2026-11-20T07:40:52Z,-3
+2026-11-12,ph,20,ADÉLA,Ain't In LA,2597948,kworb,2026-11-20T07:40:52Z,-6
