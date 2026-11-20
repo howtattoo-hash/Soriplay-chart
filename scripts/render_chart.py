@@ -541,9 +541,7 @@ def render(args) -> dict:
             if tick_day >= 0:
                 tick_pulse_until = t + 0.75
             tick_day = day_idx
-            total_days = tl.n_dates if tl.n_dates > 1 else 1
-            tick_txt.set_text(f"{_fmt_date(tl.dates[day_idx].isoformat(), cfg['date_fmt'])}"
-                              f"   ·   {day_idx + 1}/{total_days}")
+            tick_txt.set_text(_fmt_date(tl.dates[day_idx].isoformat(), cfg['date_fmt']))
         pulse_p = max(0.0, min(1.0, (tick_pulse_until - t) / 0.75))
         tick_halo.set_alpha(0.55 * pulse_p)
         tick_bg.set_edgecolor(blend((0.298, 0.227, 0.478, 1.0), (1.0, 0.85, 0.40, 1.0), pulse_p))
