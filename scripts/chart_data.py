@@ -4,12 +4,17 @@ render_chart.py(영상)와 build_audio.py(오디오)가 같은 타임라인을 �
 계산 로직을 한 곳에 모아둔다.
 
 타임라인 규칙
-  - CSV에 쌓인 날짜들을 왼쪽(과거) → 오른쪽(최신) 순서로 균등 배치한다.
-  - 각 구간은 smoothstep(ease-in-out)으로 보간해서 막대가 부드럽게 자란다.
-  - 어떤 날짜에 차트에 없던 곡은 스트림 0으로 본다(막대가 새로 등장).
+  - CSV에 쌓인 시점(주간이면 주 단위)을 왼쪽(과거) → 오른쪽(최신) 순서로 균등 배치한다.
+  - 시점과 시점 사이는 **곡마다 다른 속도 곡선**으로 보간한다. 어떤 곡은 초반에 몰아서
+    오르고 어떤 곡은 막판에 치고 올라오므로, 영상 안에서 막대가 서로를 추월했다가
+    다시 따라잡는 장면이 계속 생긴다.
+  - 곡별 곡선은 제목 해시로 정해지므로 같은 데이터를 다시 렌더해도 결과가 똑같다.
+  - 곡별 P+(직전 기간 대비 순위 변화)가 CSV 에 있으면 배지(▲2 / ▼1 / NEW)에 그대로 쓴다.
+  - 어떤 시점에 차트에 없던 곡은 스트림 0으로 본다(막대가 새로 등장).
 """
 from __future__ import annotations
 
+import hashlib
 import math
 from dataclasses import dataclass, field
 
@@ -17,6 +22,10 @@ import numpy as np
 import pandas as pd
 
 REQUIRED_COLUMNS = ["chart_date", "country", "rank", "artist", "title", "streams", "source"]
+
+# 곡별 보간 곡선 파라미터 범위
+K_RANGE = (0.55, 1.90)      # 작을수록 초반에 몰아 오름, 클수록 막판에 치고 올라옴
+AMP_RANGE = (0.015, 0.075)  # 구간 중간의 출렁임(추월을 여러 번 만들기 위한 작은 진폭)
 
 
 def track_key(artist: str, title: str) -> str:
@@ -28,8 +37,31 @@ def smoothstep(x: float) -> float:
     return x * x * (3.0 - 2.0 * x)
 
 
+def curve_params(key: str) -> tuple[float, float, float]:
+    """곡 키 하나로 (속도 지수 k, 출렁임 진폭, 위상)을 만든다. 해시라 항상 같은 값."""
+    h = hashlib.sha1(key.encode("utf-8")).digest()
+    k = K_RANGE[0] + (K_RANGE[1] - K_RANGE[0]) * (h[0] / 255.0)
+    amp = AMP_RANGE[0] + (AMP_RANGE[1] - AMP_RANGE[0]) * (h[1] / 255.0)
+    phase = (h[2] / 255.0) * 2.0 * math.pi
+    return k, amp, phase
+
+
+def ease_vector(u: np.ndarray, k: np.ndarray, amp: np.ndarray,
+                phase: np.ndarray) -> np.ndarray:
+    """구간 진행도 u(0~1)에서 곡별로 다른 성장 곡선. u=0 → 0, u=1 → 1 보장."""
+    u = np.clip(u, 0.0, 1.0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        a = np.power(u, k)
+        b = np.power(1.0 - u, k)
+        s = np.where((a + b) > 0, a / (a + b), u)
+    s = np.where(u <= 0.0, 0.0, np.where(u >= 1.0, 1.0, s))
+    wave = amp * np.sin(np.pi * u) * np.sin(2.0 * np.pi * u + phase)
+    wave = np.where((u <= 0.0) | (u >= 1.0), 0.0, wave)
+    return s + wave
+
+
 def load_history(path: str, max_days: int = 7) -> pd.DataFrame:
-    """CSV를 읽어 최근 max_days일치만 남기고 정리한다."""
+    """CSV를 읽어 최근 max_days개 시점만 남기고 정리한다."""
     df = pd.read_csv(path)
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
@@ -59,29 +91,33 @@ class Timeline:
     labels: dict                     # key -> (artist, title)
     values: np.ndarray               # shape (n_dates, n_keys)
     ranks: np.ndarray                # shape (n_dates, n_keys), 없는 곡은 큰 값
-    duration: float = 18.0
+    duration: float = 45.0
     fps: int = 30
     top_n: int = 10
+    official_change: dict = field(default_factory=dict)   # key -> '+7' / '-1' / 'NEW' …
     frames: int = field(init=False)
 
     def __post_init__(self):
         self.frames = max(2, int(round(self.duration * self.fps)))
         self.n_dates = len(self.dates)
+        params = np.array([curve_params(k) for k in self.keys], dtype=float)
+        self.curve_k = params[:, 0]
+        self.curve_amp = params[:, 1]
+        self.curve_phase = params[:, 2]
 
     # --- 시간 → 날짜 인덱스 ---------------------------------------------------
     def progress(self, i_frame: int) -> float:
-        """0.0(첫 날짜) → 1.0(마지막 날짜) 진행도."""
+        """0.0(첫 시점) → 1.0(마지막 시점) 진행도."""
         if self.frames <= 1:
             return 1.0
         return i_frame / (self.frames - 1)
 
     def _pos(self, i_frame: int) -> float:
+        """시점 사이의 연속 위치(0 ~ n_dates-1). 곡선은 values_at 에서 곡별로 적용한다."""
         u = self.progress(i_frame)
         if self.n_dates <= 1:
             return 0.0
-        p = u * (self.n_dates - 1)
-        k = min(int(math.floor(p)), self.n_dates - 2)
-        return k + smoothstep(p - k)
+        return u * (self.n_dates - 1)
 
     def date_label(self, i_frame: int) -> str:
         """보간된 날짜 라벨 (진행 바 표시용)."""
@@ -94,13 +130,19 @@ class Timeline:
     # --- 프레임별 값 ---------------------------------------------------------
     def values_at(self, i_frame: int) -> np.ndarray:
         pos = self._pos(i_frame)
-        k = min(int(math.floor(pos)), max(self.n_dates - 2, 0))
-        frac = pos - k
         if self.n_dates == 1:
             return self.values[0].astype(float)
+        k = min(int(math.floor(pos)), self.n_dates - 2)
+        frac = pos - k
         a = self.values[k].astype(float)
         b = self.values[k + 1].astype(float)
-        return a + (b - a) * frac
+        if frac <= 0.0:
+            return a
+        if frac >= 1.0:
+            return b
+        ease = ease_vector(np.full(len(self.keys), frac), self.curve_k,
+                           self.curve_amp, self.curve_phase)
+        return a + (b - a) * ease
 
     def order_at(self, i_frame: int, n: int | None = None) -> list[str]:
         n = n or self.top_n
@@ -108,11 +150,26 @@ class Timeline:
         idx = np.argsort(-vals, kind="stable")[:n]
         return [self.keys[i] for i in idx]
 
+    def rank_map(self, i_frame: int) -> dict[str, int]:
+        """곡별 현재 순위(1부터). top_n 밖은 큰 값."""
+        vals = self.values_at(i_frame)
+        order = np.argsort(-vals, kind="stable")
+        return {self.keys[i]: r + 1 for r, i in enumerate(order)}
+
+    def rank_swing(self) -> dict[str, int]:
+        """영상 처음 순위 - 마지막 순위. 양수면 올라간 곡."""
+        def ranks_at(i: int) -> dict[str, int]:
+            vals = self.values_at(i)
+            order = np.argsort(-vals, kind="stable")
+            return {self.keys[j]: r + 1 for r, j in enumerate(order)}
+        first, last = ranks_at(0), ranks_at(self.frames - 1)
+        return {k: first.get(k, 10 ** 6) - last.get(k, 10 ** 6) for k in self.keys}
+
     def max_value(self) -> float:
         return float(max(1.0, self.values.max()))
 
     # --- 오디오 전환용: 1위 곡 구간 ------------------------------------------
-    def top1_segments(self, min_len: float = 0.8) -> list[dict]:
+    def top1_segments(self, min_len: float = 2.0) -> list[dict]:
         """프레임별 1위 곡을 묶어 (시작초, 종료초, 곡) 구간 목록을 만든다."""
         raw: list[dict] = []
         for i in range(self.frames):
@@ -149,13 +206,13 @@ class Timeline:
 
 
 def build_timeline(df: pd.DataFrame, country: str, top_n: int = 10,
-                   duration: float = 18.0, fps: int = 30,
-                   extra_keys: int = 4) -> Timeline:
+                   duration: float = 45.0, fps: int = 30,
+                   extra_keys: int = 6) -> Timeline:
     """정리된 히스토리로 Timeline을 만든다."""
     if df.empty:
         raise SystemExit("차트 데이터가 비어 있습니다. fetch_spotify.py를 먼저 실행하세요.")
     dates = sorted(df["chart_date"].unique())
-    # 각 날짜의 상위권에 한 번이라도 들어온 곡만 무대에 올린다.
+    # 각 시점의 상위권에 한 번이라도 들어온 곡만 무대에 올린다(추월 장면이 많도록 여유를 둔다).
     keys: list[str] = []
     for d in dates:
         day = df[df["chart_date"] == d].sort_values("rank")
@@ -178,13 +235,36 @@ def build_timeline(df: pd.DataFrame, country: str, top_n: int = 10,
             values[j, i] = val_map.get(k, 0)
             ranks[j, i] = rank_map.get(k, 10 ** 6)
 
-    # 값이 큰 곡 위주로 최대 16곡까지만 유지(프레임 렌더링 비용 상한)
-    if len(keys) > 16:
-        order = np.argsort(-values.max(axis=0))[:16]
+    # 값이 큰 곡 위주로 최대 18곡까지만 유지(프레임 렌더링 비용 상한)
+    if len(keys) > 18:
+        order = np.argsort(-values.max(axis=0))[:18]
         keys = [keys[i] for i in order]
         values = values[:, order]
         ranks = ranks[:, order]
+        labels = {k: labels[k] for k in keys}
+
+    # 최신 시점의 공식 순위 변화(P+) — 있으면 배지에 그대로 쓴다
+    official: dict[str, str] = {}
+    if "rank_change" in df.columns:
+        last = df[df["chart_date"] == dates[-1]]
+        for _i, row in last.iterrows():
+            raw = row.get("rank_change")
+            if pd.isna(raw):
+                continue
+            if isinstance(raw, str):
+                val = raw.strip()
+                if not val:
+                    continue
+            else:
+                try:
+                    num = int(raw)
+                except (TypeError, ValueError):
+                    continue
+                if num == 0:
+                    continue
+                val = f"+{num}" if num > 0 else str(num)
+            official[row["key"]] = val
 
     return Timeline(country=country, dates=dates, keys=keys, labels=labels,
                     values=values, ranks=ranks, duration=duration,
-                    fps=fps, top_n=top_n)
+                    fps=fps, top_n=top_n, official_change=official)

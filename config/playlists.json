@@ -1,0 +1,21 @@
+{
+  "_comment": "13개국 재생목록 ID. scripts/ensure_playlists.py --write 를 한 번 돌리면 자동으로 채워진다. 비어 있으면 upload_youtube.py는 영상만 올리고 재생목록 단계는 건너뛴다(파이프라인은 계속 진행).",
+  "_scopes": "재생목록 생성·영상 추가에는 https://www.googleapis.com/auth/youtube 스코프가 필요하다. youtube.upload + youtube.readonly 로는 조회만 된다.",
+  "channel": "soriplay",
+  "updated_at": null,
+  "playlists": {
+    "global": {"title": "🌍 Spotify Global Weekly Chart", "id": ""},
+    "kr": {"title": "🇰🇷 Spotify Korea Weekly Chart", "id": ""},
+    "us": {"title": "🇺🇸 Spotify US Weekly Chart", "id": ""},
+    "gb": {"title": "🇬🇧 Spotify UK Weekly Chart", "id": ""},
+    "br": {"title": "🇧🇷 Spotify Brazil Weekly Chart", "id": ""},
+    "mx": {"title": "🇲🇽 Spotify Mexico Weekly Chart", "id": ""},
+    "id": {"title": "🇮🇩 Spotify Indonesia Weekly Chart", "id": ""},
+    "vn": {"title": "🇻🇳 Spotify Vietnam Weekly Chart", "id": ""},
+    "th": {"title": "🇹🇭 Spotify Thailand Weekly Chart", "id": ""},
+    "ph": {"title": "🇵🇭 Spotify Philippines Weekly Chart", "id": ""},
+    "my": {"title": "🇲🇾 Spotify Malaysia Weekly Chart", "id": ""},
+    "sa": {"title": "🇸🇦 Spotify Saudi Arabia Weekly Chart", "id": ""},
+    "in": {"title": "🇮🇳 Spotify India Weekly Chart", "id": ""}
+  }
+}

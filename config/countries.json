@@ -1,0 +1,136 @@
+{
+  "_comment": "스포티파이 주간 차트 쇼츠가 다루는 13개 시장. order 배열이 하루 두 곳씩 돌아가는 순서다(월 09:00부터). label은 영상 상단 배지, market은 유튜브 제목·설명에 쓰는 그 나라 말 이름, lang은 유튜브 문구 언어, video_lang은 영상 안 글자 언어(복잡 문자는 영어로 둔다).",
+  "order": ["global", "kr", "us", "gb", "br", "mx", "id", "vn", "th", "ph", "my", "sa", "in"],
+  "countries": {
+    "global": {
+      "label": "GLOBAL",
+      "market": "Global",
+      "name_en": "Global",
+      "lang": "en",
+      "video_lang": "en",
+      "date_fmt": "%m/%d",
+      "week_fmt": "%m.%d",
+      "playlist": "🌍 Spotify Global Weekly Chart"
+    },
+    "kr": {
+      "label": "KOREA",
+      "market": "한국",
+      "name_en": "South Korea",
+      "lang": "ko",
+      "video_lang": "ko",
+      "date_fmt": "%m/%d",
+      "week_fmt": "%m.%d",
+      "playlist": "🇰🇷 Spotify Korea Weekly Chart"
+    },
+    "us": {
+      "label": "USA",
+      "market": "US",
+      "name_en": "United States",
+      "lang": "en",
+      "video_lang": "en",
+      "date_fmt": "%m/%d",
+      "week_fmt": "%m.%d",
+      "playlist": "🇺🇸 Spotify US Weekly Chart"
+    },
+    "gb": {
+      "label": "UK",
+      "market": "UK",
+      "name_en": "United Kingdom",
+      "lang": "en",
+      "video_lang": "en",
+      "date_fmt": "%m/%d",
+      "week_fmt": "%m.%d",
+      "playlist": "🇬🇧 Spotify UK Weekly Chart"
+    },
+    "br": {
+      "label": "BRAZIL",
+      "market": "Brasil",
+      "name_en": "Brazil",
+      "lang": "pt",
+      "video_lang": "pt",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇧🇷 Spotify Brazil Weekly Chart"
+    },
+    "mx": {
+      "label": "MEXICO",
+      "market": "México",
+      "name_en": "Mexico",
+      "lang": "es",
+      "video_lang": "es",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇲🇽 Spotify Mexico Weekly Chart"
+    },
+    "id": {
+      "label": "INDONESIA",
+      "market": "Indonesia",
+      "name_en": "Indonesia",
+      "lang": "id",
+      "video_lang": "id",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇮🇩 Spotify Indonesia Weekly Chart"
+    },
+    "vn": {
+      "label": "VIETNAM",
+      "market": "Việt Nam",
+      "name_en": "Vietnam",
+      "lang": "vi",
+      "video_lang": "vi",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇻🇳 Spotify Vietnam Weekly Chart"
+    },
+    "th": {
+      "label": "THAILAND",
+      "market": "ไทย",
+      "name_en": "Thailand",
+      "lang": "th",
+      "video_lang": "en",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇹🇭 Spotify Thailand Weekly Chart"
+    },
+    "ph": {
+      "label": "PHILIPPINES",
+      "market": "Philippines",
+      "name_en": "Philippines",
+      "lang": "fil",
+      "video_lang": "fil",
+      "date_fmt": "%m/%d",
+      "week_fmt": "%m.%d",
+      "playlist": "🇵🇭 Spotify Philippines Weekly Chart"
+    },
+    "my": {
+      "label": "MALAYSIA",
+      "market": "Malaysia",
+      "name_en": "Malaysia",
+      "lang": "ms",
+      "video_lang": "ms",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇲🇾 Spotify Malaysia Weekly Chart"
+    },
+    "sa": {
+      "label": "SAUDI ARABIA",
+      "market": "السعودية",
+      "name_en": "Saudi Arabia",
+      "lang": "ar",
+      "video_lang": "en",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇸🇦 Spotify Saudi Arabia Weekly Chart"
+    },
+    "in": {
+      "label": "INDIA",
+      "market": "भारत",
+      "name_en": "India",
+      "lang": "hi",
+      "video_lang": "en",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇮🇳 Spotify India Weekly Chart"
+    }
+  }
+}

@@ -1,81 +1,91 @@
-# GitHub에 올리는 방법 (현재 상태 안내)
+# GitHub에 올리는 방법 / 현재 상태
 
-이 폴더는 **완성된 자동화 프로젝트**입니다. 다만 지금 연결된 GitHub(`@howtattoo-hash`)의
-Pickle 앱 권한으로는 **새 저장소를 만들 수도, 기존 저장소가 보이지도 않는 상태**라
-자동으로 올리지 못했습니다.
+- 저장소: **`howtattoo-hash/Soriplay-chart`** (사용자가 생성)
+- 이 폴더는 그 저장소의 `main` 브랜치로 push 되어 있고, Actions 워크플로가 켜져 있다.
 
-- `gh api /user/repos` → `[]` (공유된 저장소 0개)
-- `gh repo create` → `Resource not accessible by integration (createRepository)`
+## 처음 한 번만 하는 설정
 
-아래 둘 중 하나만 해주시면 바로 올리고 자동 실행까지 확인할 수 있습니다.
+### 1) 저장소 Secrets
 
----
+저장소 → **Settings → Secrets and variables → Actions → Secrets**
 
-## 방법 A — 저장소를 하나 만들어 주시면 됩니다 (가장 간단, 20초)
+| 이름 | 값 | 출처 |
+|---|---|---|
+| `YOUTUBE_TOKEN_JSON` | 토큰 JSON **한 줄 전체** | `downloads/youtube_token.json` 내용 |
+| `YOUTUBE_CLIENT_SECRET_JSON` | OAuth 클라이언트 JSON | `downloads/youtube_client_secret.json` 내용 |
 
-1. https://github.com/new 접속
-2. Repository name: **`sori-play-chart-shorts`**
-3. **Private** 선택 → *Create repository* (README/ignore 파일은 추가하지 마세요)
-4. https://github.com/apps/pickle/installations/new 에서 이 저장소가 Pickle에
-   **선택(체크)** 되어 있는지 확인 (Repository access → *Only select repositories* →
-   `sori-play-chart-shorts` 추가)
-
-그다음 이 폴더에서 아래 두 줄만 실행하면 올라갑니다(로컬 커밋은 이미 만들어져 있습니다).
+명령줄로 넣을 수도 있다(이미 실행해 두었다면 건너뛰기):
 
 ```bash
-cd sori-play-chart-shorts
-git remote add origin https://github.com/howtattoo-hash/sori-play-chart-shorts.git
-git push -u origin main
+gh secret set YOUTUBE_TOKEN_JSON        -R howtattoo-hash/Soriplay-chart < downloads/youtube_token.json
+gh secret set YOUTUBE_CLIENT_SECRET_JSON -R howtattoo-hash/Soriplay-chart < downloads/youtube_client_secret.json
+gh secret list -R howtattoo-hash/Soriplay-chart
 ```
 
-> push가 `403` 으로 막히면 이 저장소가 Pickle 앱에 선택되어 있지 않은 것이니
-> 4번(앱 설치 화면에서 저장소 체크)을 다시 확인해 주세요.
+### 2) (선택) Variables
 
-## 방법 B — Pickle 앱에 "저장소 만들기" 권한을 주는 경우
+저장소 → **Settings → Secrets and variables → Actions → Variables**
 
-GitHub → Settings → Applications → Pickle → *Configure* 에서
-**Administration: Read and write**(Repository creation) 항목을 허용하고
-Repository access를 *All repositories* 로 바꿔주시면, 제가 저장소 생성부터
-push·자동 실행 확인까지 한 번에 처리합니다.
+| 이름 | 값 | 효과 |
+|---|---|---|
+| `YT_PRIVACY` | `unlisted` | 모든 업로드를 미공개로 (시험 운영) |
+| `YOUTUBE_PLAYLISTS_JSON` | `{"kr":"PL...","global":"PL..."}` | 재생목록 ID를 파일 대신 변수로 |
 
----
+## 지금 상태에서 남은 한 가지: 재생목록
 
-## 올라간 뒤 자동 실행 확인
+현재 토큰 스코프는 `youtube.upload + youtube.readonly` 라서
+**영상 업로드는 되지만 재생목록 생성·추가는 권한 부족으로 실패**한다
+(영상은 정상 업로드되고, 로그에 안내만 남는다).
 
-1. 저장소 → **Actions** 탭 → *Daily Spotify Chart Short* → **Run workflow**
-   → `country` = `kr`(또는 `both`) → 실행
-2. 약 4~6분 뒤 실행 결과에서 artifact **sori-shorts-N** 안의
-   `soriplay_spotify_kr_YYYYMMDD.mp4` 를 내려받으면 완성본입니다.
-3. 매일 09:00 KST 자동 실행이 켜져 있고, `data/*.csv` 가 매일 자동 커밋됩니다.
-
-명령줄로 확인하려면:
+13개국 재생목록까지 자동으로 쓰려면 토큰을 한 번 다시 발급한다.
 
 ```bash
-gh workflow run daily-chart.yml -f country=kr
-gh run list --workflow=daily-chart.yml
-gh run watch
-gh run download <run-id> -n sori-shorts-<n>
+python scripts/get_youtube_token.py --client-secret youtube_client_secret.json --scopes upload,playlist
+# → 출력된 JSON 한 줄을 YOUTUBE_TOKEN_JSON 시크릿에 덮어쓰기
 ```
 
----
+그다음 Actions → *13-Market Weekly Chart Shorts* → Run workflow →
+`setup_playlists` 체크 → 실행하면 13개 재생목록이 만들어지고
+`config/playlists.json` 에 ID가 커밋된다(수동으로 돌릴 때는 로컬에서
+`python scripts/ensure_playlists.py`).
 
-## 참고: GitHub Actions를 안 쓰고 서버에서 돌리는 방법
+## 자동 실행 확인
 
-이미 운영 중인 서버(예: `swedish24` 서버나 `soriplay.com` 서버)에서 돌려도 됩니다.
+1. 저장소 → **Actions** 탭 → *13-Market Weekly Chart Shorts*
+2. **Run workflow** → `country`=auto(또는 kr), `period`=weekly,
+   `upload`=skip(안전 확인) 또는 `unlisted`(실제 업로드 확인) → 실행
+3. 5~10분 뒤 실행 결과에서 artifact **sori-shorts-N** 안의
+   `soriplay_spotify_{국가}_weekly_YYYYMMDD.mp4` 를 내려받으면 완성본이다.
+4. 이후 매일 09:00·19:00 KST 에 두 나라씩 자동으로 올라간다(일요일은 09:00 한 편).
+
+명령줄로 확인:
+
+```bash
+gh workflow run weekly-chart.yml -R howtattoo-hash/Soriplay-chart -f country=kr -f upload=skip
+gh run list -R howtattoo-hash/Soriplay-chart --limit 5
+gh run watch <run-id> -R howtattoo-hash/Soriplay-chart
+gh run download <run-id> -R howtattoo-hash/Soriplay-chart -n sori-shorts-<n>
+```
+
+## GitHub Actions를 안 쓰고 서버에서 돌리는 방법
+
+이미 운영 중인 서버(예: `soriplay.com` 서버)에서 돌려도 된다.
 
 ```bash
 # 1) 코드 복사 (zip 업로드 또는 git clone)
+git clone https://github.com/howtattoo-hash/Soriplay-chart.git
+cd Soriplay-chart
+
 # 2) 의존성
-sudo apt install -y ffmpeg fonts-noto-cjk python3-pip
+sudo apt install -y ffmpeg fonts-noto-cjk fonts-noto-core fonts-nanum fonts-thai-tlwg python3-pip
 pip3 install -r requirements.txt
 
 # 3) 한 번 수동 실행해서 확인
-python3 scripts/make_short.py --country both
+python3 scripts/make_short.py --period weekly --country kr
 
-# 4) cron 등록 (매일 09:00 KST)
-crontab -e
-0 9 * * * cd /home/ubuntu/sori-play-chart-shorts && /usr/bin/python3 scripts/make_short.py --country kr >> shorts.log 2>&1
+# 4) cron 등록 (매일 09:00·19:00 KST → 순번 국가 자동 선택)
+0 9,19 * * * cd /home/ubuntu/Soriplay-chart && /usr/bin/python3 scripts/make_short.py --period weekly --country auto >> shorts.log 2>&1
 ```
 
-YouTube 자동 업로드까지 하려면 `YOUTUBE_TOKEN_JSON` 환경변수에 토큰을 넣어주면 됩니다
-(`python3 scripts/get_youtube_token.py` 로 발급).
+YouTube 자동 업로드까지 하려면 `YOUTUBE_TOKEN_JSON` 환경변수나
+프로젝트 폴더의 `youtube_token.json` 파일을 쓰면 된다(`get_youtube_token.py` 로 발급).

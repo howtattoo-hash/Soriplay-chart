@@ -5,3 +5,9 @@ output/
 .preview/
 .DS_Store
 client_secret*.json
+
+# 자격 증명은 절대 커밋하지 않는다
+youtube_token.json
+youtube_client_secret.json
+token*.json
+!config/playlists.json

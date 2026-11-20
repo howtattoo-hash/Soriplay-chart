@@ -3,17 +3,22 @@
 
 - matplotlib으로 프레임을 그려 ffmpeg 파이프로 바로 인코딩한다(.mp4).
 - 각 막대 왼쪽에 **원형 앨범 커버 썸네일**이 붙어 순위를 따라 함께 이동한다.
-- 막대/숫자는 날짜 사이를 ease-in-out으로 보간해 부드럽게 자란다.
+- 곡마다 다른 속도 곡선(chart_data.ease_vector)으로 자라므로 영상 안에서
+  막대가 서로를 **추월했다가 다시 따라잡는** 장면이 계속 나온다.
+- 순위가 바뀔 때: 스프링 이동(살짝 튀어 오름) · ▲/▼/NEW 배지 · 금색 번쩍임.
+- 1위가 바뀌면 상단에 **NEW #1 왕관 배너**가 잠깐 뜨고 그 막대가 금색으로 빛난다.
+- 스트림 숫자는 매 프레임 갱신되는 **롤링 카운터**다.
 - 렌더링이 끝나면 output/<이름>.json 에 타임라인(1위 곡 구간 포함)을 남겨
   build_audio.py 가 배경 음악을 갈아끼울 수 있게 한다.
 
 사용 예
-  python scripts/render_chart.py --country kr --out output/kr.mp4
-  python scripts/render_chart.py --country kr --frames-dir .preview --preview 0,120,269
+  python scripts/render_chart.py --country kr --period weekly --out output/kr.mp4
+  python scripts/render_chart.py --country kr --period weekly --frames-dir .preview --preview 0,675,1349
 """
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import shutil
@@ -22,7 +27,9 @@ import sys
 
 import numpy as np
 
+import chart_config
 import chart_data
+import locales
 import media
 
 W, H = 1080, 1920
@@ -34,6 +41,10 @@ SUB = "#DCDCEA"
 DIM = "#9C9CB4"
 FAINT = "#5C5C74"
 ACCENT = "#A855F7"
+UP_COLOR = "#4ADE80"
+DOWN_COLOR = "#F87171"
+GOLD = (1.0, 0.80, 0.20, 1.0)
+GOLD_HEX = "#F5B301"
 
 BAR_H = 0.62          # 막대 두께(행 단위)
 THUMB_PX = 86         # 썸네일 지름(픽셀)
@@ -42,6 +53,13 @@ RANK_X = 0.108        # 순위 숫자 x
 LABEL_PT = 15.5
 SUBLABEL_PT = 10.5
 VALUE_PT = 12.0
+
+FLASH_SEC = 0.85      # 추월 번쩍임 지속
+CROWN_SEC = 2.6       # NEW #1 배너 노출
+CROWN_GAP = 1.0       # 배너 최소 간격(1위가 요동칠 때 깜빡임 방지)
+SPRING_K = 62.0       # 스프링 강성(클수록 빠르게 이동)
+SPRING_D = 12.0       # 감쇠(작을수록 더 튐)
+MAX_VEL = 40.0
 
 FONT_CANDIDATES = [
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
@@ -52,37 +70,45 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
     "/usr/share/fonts/pickle-hwp/NotoSansCJKkr-Regular.otf",
 ]
+# 앞에서부터 우선. matplotlib 3.6+ 는 목록을 글자별 대체(fallback) 순서로 쓴다.
 FONT_NAMES = ["Noto Sans CJK KR", "Noto Sans KR", "Noto Sans CJK JP",
-              "NanumGothic", "Malgun Gothic", "Noto Sans CJK SC"]
+              "Noto Sans", "Noto Sans Thai", "Noto Sans Arabic", "Noto Sans Devanagari",
+              "NanumGothic", "Malgun Gothic", "Noto Sans CJK SC", "DejaVu Sans"]
 
 
-def ensure_font() -> str | None:
-    """한글 폰트를 matplotlib에 등록하고 이름을 돌려준다."""
+def ensure_fonts() -> list[str]:
+    """쓸 수 있는 글꼴을 대체 순서 목록으로 돌려준다(한글·태국·아랍·데바나가리 포함)."""
     from matplotlib import font_manager
 
     seen: set[str] = set()
+    extra: list[str] = []
     candidates = list(FONT_CANDIDATES)
-    for root in ("/usr/share/fonts", "/usr/local/share/fonts"):
+    for root in ("/usr/share/fonts", "/usr/local/share/fonts", os.path.expanduser("~/.fonts")):
         if not os.path.isdir(root):
             continue
         for dirpath, _dirs, files in os.walk(root):
             for f in files:
                 low = f.lower()
                 if low.endswith((".ttc", ".otf", ".ttf")) and (
-                        "notosanscjk" in low or "notosanskr" in low or "nanumgothic" in low):
+                        "notosans" in low or "nanumgothic" in low
+                        or "tlwg" in dirpath.lower() or "noto" in low):
                     candidates.append(os.path.join(dirpath, f))
     for path in candidates:
-        if os.path.exists(path) and path not in seen:
-            seen.add(path)
-            try:
-                font_manager.fontManager.addfont(path)
-            except Exception:  # noqa: BLE001
-                pass
+        if not (os.path.exists(path) and path not in seen):
+            continue
+        seen.add(path)
+        try:
+            font_manager.fontManager.addfont(path)
+            name = font_manager.FontProperties(fname=path).get_name()
+            if name and name not in extra:
+                extra.append(name)
+        except Exception:  # noqa: BLE001
+            pass
     available = {f.name for f in font_manager.fontManager.ttflist}
-    for name in FONT_NAMES:
-        if name in available:
-            return name
-    return None
+    families = [name for name in FONT_NAMES if name in available]
+    # 남은 글꼴(태국·아랍 등)은 뒤에 붙여 글자 단위 대체가 되게 한다.
+    families += [name for name in extra if name not in families]
+    return (families or ["DejaVu Sans"])[:8]
 
 
 def find_ffmpeg() -> str:
@@ -108,8 +134,24 @@ def bar_palette(n: int) -> list[tuple[float, float, float, float]]:
             for i, (r, g, b) in enumerate(cols[:n])]
 
 
+def blend(color, target, amount: float):
+    amount = max(0.0, min(1.0, amount))
+    return (color[0] + (target[0] - color[0]) * amount,
+            color[1] + (target[1] - color[1]) * amount,
+            color[2] + (target[2] - color[2]) * amount,
+            color[3] if len(color) > 3 else 1.0)
+
+
 def fmt(v: float) -> str:
     return f"{v:,.0f}"
+
+
+def _fmt_date(iso: str, pattern: str) -> str:
+    """'2026-11-12' → cfg의 date_fmt(예: 11/12 · 12/11)."""
+    try:
+        return dt.date.fromisoformat(str(iso)).strftime(pattern)
+    except ValueError:
+        return str(iso)
 
 
 def text_px(s: str, fontsize_pt: float, dpi: float = 100.0) -> float:
@@ -139,25 +181,63 @@ def fit_text(s: str, avail_px: float, fontsize_pt: float) -> str:
     return (out + "…") if out else ""
 
 
+def _badges(tl, first_rank: dict, last_rank: dict) -> dict[str, tuple[str, str]]:
+    """곡별 순위 변화 배지(문구, 색). 공식 P+ 가 있으면 그걸 우선한다."""
+    out: dict[str, tuple[str, str]] = {}
+    top_n = tl.top_n
+    for key in tl.keys:
+        lr = last_rank.get(key, 10 ** 6)
+        if lr > top_n:
+            continue
+        off = (tl.official_change or {}).get(key, "")
+        if off.upper().startswith("NEW"):
+            out[key] = ("NEW", ACCENT)
+            continue
+        if off[:1] in {"+", "-"} and off[1:].isdigit():
+            n = int(off)
+            if n > 0:
+                out[key] = (f"▲{n}", UP_COLOR)
+            elif n < 0:
+                out[key] = (f"▼{-n}", DOWN_COLOR)
+            continue
+        fr = first_rank.get(key, 10 ** 6)
+        if fr > top_n:
+            out[key] = ("NEW", ACCENT)
+            continue
+        d = fr - lr
+        if d > 0:
+            out[key] = (f"▲{d}", UP_COLOR)
+        elif d < 0:
+            out[key] = (f"▼{-d}", DOWN_COLOR)
+    return out
+
+
 def render(args) -> dict:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.patches import FancyBboxPatch
 
-    font = ensure_font()
-    if font:
+    font = ensure_fonts()
+    if font and font[0] != "DejaVu Sans":
         matplotlib.rcParams["font.family"] = font
-        print(f"[render] 한글 폰트: {font}")
+        print(f"[render] 글꼴: {', '.join(font[:3])}")
     else:
         print("[render] 경고: 한글 폰트를 찾지 못했습니다. 글자가 깨질 수 있습니다.", file=sys.stderr)
     matplotlib.rcParams["axes.unicode_minus"] = False
 
     country = args.country
-    csv_path = os.path.join(args.data_dir, f"{country}_daily.csv")
+    period = getattr(args, "period", "weekly") or "weekly"
+    cfg = chart_config.country(country)
+    vloc = locales.get(cfg["video_lang"])
+    pw, pw_cap = locales.period_words(cfg["video_lang"], period)
+    vtext = {k: v.format(market=cfg["market"], pw=pw, pw_cap=pw_cap)
+             for k, v in vloc["video"].items()}
+
+    csv_path = chart_config.csv_path(args.data_dir, country, period)
     df = chart_data.load_history(csv_path, max_days=args.days)
-    tl = chart_data.build_timeline(df, country, top_n=args.top,
-                                   duration=args.duration, fps=args.fps)
+    tl = chart_data.build_timeline(df, country, top_n=args.top, duration=args.duration,
+                                   fps=args.fps)
     max_val = tl.max_value()
     n_rows = tl.top_n
     os.makedirs(os.path.dirname(os.path.abspath(args.out)) or ".", exist_ok=True)
@@ -186,13 +266,21 @@ def render(args) -> dict:
 
     # 헤더
     fig.text(0.070, 0.945, "Sori Play", color=TEXT, fontsize=27, fontweight="bold", va="center")
-    fig.text(0.250, 0.945, "· 스포티파이 일간 차트", color=DIM, fontsize=16, va="center")
-    label = "KOREA" if country == "kr" else "GLOBAL"
-    fig.text(0.070, 0.906, f"TOP {n_rows}  ·  {label}", color=ACCENT,
+    fig.text(0.250, 0.945, f"· {vtext['chart']}", color=DIM, fontsize=16, va="center")
+    fig.text(0.070, 0.906, f"TOP {n_rows}  ·  {cfg['label']}", color=ACCENT,
              fontsize=14, fontweight="bold", va="center")
     last_date = tl.dates[-1]
     fig.text(0.930, 0.906, last_date.strftime("%Y.%m.%d"), color=DIM,
              fontsize=14, va="center", ha="right")
+
+    # NEW #1 왕관 배너 (평소엔 투명)
+    crown_bg = FancyBboxPatch((0.058, 0.874), 0.884, 0.044,
+                              boxstyle="round,pad=0.004,rounding_size=0.020",
+                              transform=fig.transFigure, facecolor=GOLD_HEX,
+                              edgecolor="none", alpha=0.0, zorder=30)
+    fig.patches.append(crown_bg)
+    crown_txt = fig.text(0.5, 0.896, "", color="#1A1207", fontsize=15.5,
+                         fontweight="bold", ha="center", va="center", alpha=0.0, zorder=31)
 
     # 차트 영역 (왼쪽 거터: 순위 + 원형 커버)
     ax = fig.add_axes([0.245, 0.150, 0.700, 0.720])
@@ -210,12 +298,23 @@ def render(args) -> dict:
     def val_to_px(v: float) -> float:
         return v / (max_val * 1.16) * bar_px_full
 
-    bars, titles, subs, values, thumbs, ranks = {}, {}, {}, {}, {}, {}
+    bars, glows, titles, subs, values, thumbs, ranks, badges = {}, {}, {}, {}, {}, {}, {}, {}
     y_cur: dict[str, float] = {}
+    y_vel: dict[str, float] = {}
+    alpha_cur: dict[str, float] = {}
+
+    first_rank = tl.rank_map(0)
+    last_rank = tl.rank_map(tl.frames - 1)
+    badge_spec = _badges(tl, first_rank, last_rank)
 
     for i, key in enumerate(tl.keys):
-        y0 = n_rows - 1 - min(i, n_rows - 1)
-        line, = ax.plot([0, 0], [y0, y0], lw=bar_lw, color=pal[min(i, n_rows - 1)],
+        r0 = first_rank.get(key, n_rows + 6)
+        y0 = n_rows - 1 - min(r0 - 1, n_rows + 5)
+        base = pal[min(i, n_rows - 1)]
+        glow, = ax.plot([0, 0], [y0, y0], lw=bar_lw * 1.45, color=GOLD,
+                        solid_capstyle="round", zorder=2, alpha=0)
+        glows[key] = glow
+        line, = ax.plot([0, 0], [y0, y0], lw=bar_lw, color=base,
                         solid_capstyle="round", zorder=3, alpha=0)
         bars[key] = line
         titles[key] = ax.text(max_val * 0.012, y0 + 0.085, "", color=TEXT,
@@ -229,10 +328,15 @@ def render(args) -> dict:
                               fontweight="bold")
         ranks[key] = fig.text(RANK_X, 0.5, "", color="#7C7C96", fontsize=19,
                               fontweight="bold", ha="center", va="center", alpha=0)
+        btxt, bcol = badge_spec.get(key, ("", UP_COLOR))
+        badges[key] = fig.text(RANK_X, 0.5, btxt, color=bcol, fontsize=10.5,
+                               fontweight="bold", ha="center", va="center", alpha=0)
         art = circ.get(key)
         thumbs[key] = (fig.figimage(art, 0, 0, zorder=20, origin="upper")
                        if art is not None else None)
         y_cur[key] = y0
+        y_vel[key] = 0.0
+        alpha_cur[key] = 1.0 if key in first_rank and first_rank[key] <= n_rows else 0.0
 
     # 진행 바 + 날짜
     pax = fig.add_axes([0.070, 0.108, 0.860, 0.012])
@@ -243,8 +347,8 @@ def render(args) -> dict:
     prog_fill, = pax.plot([0, 0], [0, 0], color=ACCENT, lw=3.5,
                           solid_capstyle="round", zorder=2)
     prog_dot, = pax.plot([0], [0], marker="o", ms=7, color="#FFFFFF", zorder=3)
-    fig.text(0.070, 0.088, tl.dates[0].strftime("%m/%d"), color=FAINT, fontsize=10.5)
-    fig.text(0.930, 0.088, tl.dates[-1].strftime("%m/%d"), color=FAINT,
+    fig.text(0.070, 0.088, tl.dates[0].strftime(cfg["date_fmt"]), color=FAINT, fontsize=10.5)
+    fig.text(0.930, 0.088, tl.dates[-1].strftime(cfg["date_fmt"]), color=FAINT,
              fontsize=10.5, ha="right")
     cur_date_txt = fig.text(0.5, 0.088, "", color=DIM, fontsize=10.5, ha="center")
 
@@ -254,9 +358,9 @@ def render(args) -> dict:
                          transform=fig.transFigure, facecolor=ACCENT, edgecolor="none",
                          alpha=0.95, zorder=5)
     fig.patches.append(cta)
-    fig.text(0.5, 0.0552, "▶   지금 무료 감상 · Sori Play", color="#FFFFFF",
+    fig.text(0.5, 0.0552, vtext["cta"], color="#FFFFFF",
              fontsize=15, fontweight="bold", ha="center", va="center", zorder=6)
-    fig.text(0.5, 0.017, "데이터 Spotify 일간 차트 · 매일 자동 업데이트", color=FAINT,
+    fig.text(0.5, 0.017, vtext["footer"], color=FAINT,
              fontsize=9.5, ha="center")
 
     # ---- 인코더 -------------------------------------------------------------
@@ -280,42 +384,105 @@ def render(args) -> dict:
             if tok:
                 preview_at.add(int(tok) % tl.frames)
 
+    dt_frame = 1.0 / tl.fps
+    prev_rank: dict[str, int] = {}
+    flash_until: dict[str, float] = {}
+    crown_until = -99.0
+    last_crown = -99.0
+    prev_top1 = None
+    base_color = {k: pal[min(i, n_rows - 1)] for i, k in enumerate(tl.keys)}
+
+    # 프레임을 나눠 렌더할 때(--from-frame/--to-frame): 앞 구간은 상태만 진행하고 그리지 않는다.
+    render_from = max(0, int(getattr(args, "from_frame", 0) or 0))
+    render_to = int(getattr(args, "to_frame", 0) or 0) or tl.frames
+    render_to = min(render_to, tl.frames)
+
     # ---- 프레임 루프 --------------------------------------------------------
-    for i in range(tl.frames):
+    for i in range(render_to):
+        t = i * dt_frame
         vals = tl.values_at(i)
         vmap = {k: float(vals[j]) for j, k in enumerate(tl.keys)}
         order = tl.order_at(i)
-        visible = set(order)
+        rank_of = {k: r + 1 for r, k in enumerate(order)}
+        top1 = order[0]
 
-        for rank, key in enumerate(order):
-            target = n_rows - 1 - rank
-            y_cur[key] += (target - y_cur[key]) * 0.34
-            if abs(target - y_cur[key]) < 0.004:
-                y_cur[key] = target
+        # 1위 교체 → 왕관 배너
+        if prev_top1 is not None and top1 != prev_top1 and (t - last_crown) >= CROWN_GAP:
+            crown_until = t + CROWN_SEC
+            last_crown = t
+            artist, title = tl.labels[top1]
+            crown_txt.set_text(fit_text(f"★ NEW #1  {artist} — {title}", 900, 15.5))
+        prev_top1 = top1
+
+        # 추월 감지 → 번쩍임
+        for key, r in rank_of.items():
+            before = prev_rank.get(key)
+            if before is not None and r < before:
+                flash_until[key] = t + FLASH_SEC
+        prev_rank = dict(rank_of)
+
+        crown_p = 0.0
+        if t < crown_until:
+            left = crown_until - t
+            crown_p = min(1.0, left / 0.25, (CROWN_SEC - left) / 0.2 + 0.2)
+            crown_p = max(0.0, min(1.0, crown_p))
+        crown_bg.set_alpha(1.0 * crown_p)
+        crown_txt.set_alpha(crown_p)
+
+        # 스프링으로 y 이동(살짝 튀어 오르는 느낌)
+        for key in tl.keys:
+            r = rank_of.get(key)
+            target = (n_rows - r) if r else -1.9
+            acc = (target - y_cur[key]) * SPRING_K - y_vel[key] * SPRING_D
+            y_vel[key] = max(-MAX_VEL, min(MAX_VEL, y_vel[key] + acc * dt_frame))
+            y_cur[key] = y_cur[key] + y_vel[key] * dt_frame
+            if abs(target - y_cur[key]) < 0.0015 and abs(y_vel[key]) < 0.02:
+                y_cur[key], y_vel[key] = target, 0.0
 
         for key in tl.keys:
             y = y_cur[key]
             v = vmap[key]
-            is_vis = key in visible
             artist, title = tl.labels[key]
+            is_vis = key in rank_of and v > 0
+
+            # 페이드 (등장/퇴장이 툭 끊기지 않게)
+            target_a = 1.0 if is_vis else 0.0
+            step = dt_frame / 0.22
+            alpha_cur[key] += max(-step, min(step, target_a - alpha_cur[key]))
+            a = alpha_cur[key]
+
+            flash = max(0.0, min(1.0, (flash_until.get(key, -99.0) - t) / FLASH_SEC))
+            if t > crown_until - CROWN_SEC + 0.35 and top1 == key:
+                flash = max(flash, crown_p)
+            color = blend(base_color[key], GOLD, 0.9 * flash)
+
             bars[key].set_data([0, max(v, 0.0)], [y, y])
-            bars[key].set_alpha(1.0 if is_vis else 0.0)
+            bars[key].set_color(color)
+            bars[key].set_linewidth(bar_lw * (1.0 + 0.22 * flash))
+            bars[key].set_alpha(a)
+            glows[key].set_data([0, max(v, 0.0)], [y, y])
+            glows[key].set_alpha(0.55 * flash * a)
 
             bar_px = val_to_px(v)
             avail = bar_px - text_px("  ", LABEL_PT) - 8
             titles[key].set_position((max_val * 0.010, y + 0.085))
             titles[key].set_text(fit_text(title, avail, LABEL_PT))
-            titles[key].set_alpha(1.0 if is_vis else 0.0)
+            titles[key].set_alpha(a)
             subs[key].set_position((max_val * 0.010, y - 0.120))
             subs[key].set_text(fit_text(artist, avail, SUBLABEL_PT))
-            subs[key].set_alpha((1.0 if is_vis else 0.0) * 0.85)
+            subs[key].set_alpha(a * 0.85)
+            # 금색으로 빛나는 동안은 글자를 어둡게 바꿔 읽히게 한다.
+            hot = flash > 0.42
+            titles[key].set_color("#241604" if hot else TEXT)
+            subs[key].set_color("#3A2708" if hot else SUB)
 
             inside = v > max_val * 0.74
             val_x = (v - max_val * 0.030) if inside else (v + max_val * 0.095)
             values[key].set_position((val_x, y))
             values[key].set_horizontalalignment("right" if inside else "left")
             values[key].set_text(fmt(v) if v > 0 else "")
-            values[key].set_alpha(1.0 if is_vis else 0.0)
+            values[key].set_alpha(a)
+            values[key].set_color("#241604" if hot else ("#FFE9A8" if flash > 0.15 else "#FFFFFF"))
 
             _x, y_px = ax.transData.transform((0, y))
             fi = thumbs.get(key)
@@ -328,17 +495,20 @@ def render(args) -> dict:
                     fi.set_visible(False)
 
             rk = ranks[key]
-            if is_vis:
-                rk.set_text(str(order.index(key) + 1))
-                rk.set_alpha(1.0)
-            else:
-                rk.set_alpha(0.0)
+            rk.set_text(str(rank_of[key]) if key in rank_of else "")
+            rk.set_alpha(a)
             rk.set_position((RANK_X, y_px / H))
+            bd = badges[key]
+            bd.set_alpha(a * (0.95 if bd.get_text() else 0.0))
+            bd.set_position((RANK_X, y_px / H - 0.0205))
 
         u = tl.progress(i)
         prog_fill.set_data([0, u], [0, 0])
         prog_dot.set_data([u], [0])
-        cur_date_txt.set_text(tl.date_label(i))
+        cur_date_txt.set_text(_fmt_date(tl.date_label(i), cfg["date_fmt"]))
+
+        if i < render_from:
+            continue
 
         fig.canvas.draw()
         if writing_pngs:
@@ -348,7 +518,7 @@ def render(args) -> dict:
         else:
             buf = np.asarray(fig.canvas.buffer_rgba())
             proc.stdin.write(buf[:, :, :3].tobytes())
-        if i % 60 == 0:
+        if i % 90 == 0:
             print(f"[render] {i}/{tl.frames} 프레임", flush=True)
 
     if proc:
@@ -362,7 +532,8 @@ def render(args) -> dict:
 
     # ---- 후속 단계용 타임라인 ----------------------------------------------
     info = tl.to_dict()
-    info.update({"video": args.out, "max_value": max_val,
+    info.update({"video": args.out, "max_value": max_val, "period": period,
+                 "country_label": cfg["label"],
                  "top1": tl.order_at(tl.frames - 1, 1)[0]})
     meta_path = os.path.splitext(args.out)[0] + ".json"
     with open(meta_path, "w", encoding="utf-8") as fh:
@@ -373,17 +544,23 @@ def render(args) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="9:16 바 차트 레이스 렌더러")
-    ap.add_argument("--country", default="kr", choices=["kr", "global"])
+    ap.add_argument("--country", default="kr", help="시장 코드(예: kr, global, br …)")
+    ap.add_argument("--period", default="weekly", choices=["weekly", "daily"])
     ap.add_argument("--data-dir", default="data")
     ap.add_argument("--cache-dir", default="cache")
     ap.add_argument("--out", default="output/short.mp4")
     ap.add_argument("--top", type=int, default=10)
-    ap.add_argument("--duration", type=float, default=18.0, help="영상 길이(초)")
+    ap.add_argument("--duration", type=float, default=45.0,
+                    help="영상 길이(초) · 기본 45초(쇼츠 60초 제한 안)")
     ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--days", type=int, default=5, help="애니메이션에 쓸 최근 날짜 수")
+    ap.add_argument("--days", type=int, default=4, help="애니메이션에 쓸 최근 시점 수(주간이면 주)")
     ap.add_argument("--crf", type=int, default=20)
     ap.add_argument("--frames-dir", default="", help="PNG로 저장(인코딩 생략)")
     ap.add_argument("--preview", default="", help="PNG 저장 시 뽑을 프레임 번호(쉼표)")
+    ap.add_argument("--from-frame", type=int, default=0,
+                    help="이 프레임부터 그린다(앞 구간은 상태만 진행 · 구간 렌더용)")
+    ap.add_argument("--to-frame", type=int, default=0,
+                    help="이 프레임에서 멈춘다(0이면 끝까지 · 구간 렌더용)")
     args = ap.parse_args()
     render(args)
 
