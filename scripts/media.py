@@ -250,9 +250,14 @@ def lookup(artist: str, title: str, cache_dir: str = "cache",
                 r.setdefault("__store", store)
                 key_id = str(r.get("trackId") or r.get("artworkUrl100") or r.get("trackName"))
                 pool.setdefault(key_id, r)
-        if pool:
-            hit, score = _pick(list(pool.values()), artist, title,
-                               trust_title_search=trust, title_only=title_only)
+            # 상점을 하나 볼 때마다 바로 판단하고, 충분히 확실하면 나머지 상점은 건너뛴다.
+            if pool:
+                cand, cscore = _pick(list(pool.values()), artist, title,
+                                     trust_title_search=trust, title_only=title_only)
+                if cand is not None and cscore > score:
+                    hit, score = cand, cscore
+                if hit is not None and score >= 0.9:
+                    break
         if hit and score >= 0.72:
             break
     if not hit or score < 0.55:
