@@ -20,12 +20,16 @@ Pickle 앱 권한으로는 **새 저장소를 만들 수도, 기존 저장소가
    **선택(체크)** 되어 있는지 확인 (Repository access → *Only select repositories* →
    `sori-play-chart-shorts` 추가)
 
-그다음 이 폴더에서 아래 한 줄만 실행하면 올라갑니다.
+그다음 이 폴더에서 아래 두 줄만 실행하면 올라갑니다(로컬 커밋은 이미 만들어져 있습니다).
 
 ```bash
 cd sori-play-chart-shorts
+git remote add origin https://github.com/howtattoo-hash/sori-play-chart-shorts.git
 git push -u origin main
 ```
+
+> push가 `403` 으로 막히면 이 저장소가 Pickle 앱에 선택되어 있지 않은 것이니
+> 4번(앱 설치 화면에서 저장소 체크)을 다시 확인해 주세요.
 
 ## 방법 B — Pickle 앱에 "저장소 만들기" 권한을 주는 경우
 
