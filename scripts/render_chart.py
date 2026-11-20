@@ -57,9 +57,9 @@ VALUE_PT = 12.0
 FLASH_SEC = 0.85      # 추월 번쩍임 지속
 CROWN_SEC = 2.6       # NEW #1 배너 노출
 CROWN_GAP = 1.0       # 배너 최소 간격(1위가 요동칠 때 깜빡임 방지)
-SPRING_K = 62.0       # 스프링 강성(클수록 빠르게 이동)
-SPRING_D = 12.0       # 감쇠(작을수록 더 튐)
-MAX_VEL = 40.0
+SPRING_K = 95.0       # 스프링 강성(클수록 빠르게 이동)
+SPRING_D = 15.0       # 감쇠(작을수록 더 튐)
+MAX_VEL = 60.0
 
 FONT_CANDIDATES = [
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
@@ -280,6 +280,11 @@ def render(args) -> dict:
              color=DIM, fontsize=13.5, va="center", ha="right")
 
     # 날짜 티커: 차트가 다음 날로 넘어갈 때마다 크게 튄다.
+    tick_halo = FancyBboxPatch((0.335, 0.868), 0.330, 0.050,
+                               boxstyle="round,pad=0.004,rounding_size=0.024",
+                               transform=fig.transFigure, facecolor=GOLD_HEX,
+                               edgecolor="none", alpha=0.0, zorder=11)
+    fig.patches.append(tick_halo)
     tick_bg = FancyBboxPatch((0.345, 0.874), 0.310, 0.038,
                              boxstyle="round,pad=0.004,rounding_size=0.019",
                              transform=fig.transFigure, facecolor="#241B3A",
@@ -324,7 +329,7 @@ def render(args) -> dict:
 
     for i, key in enumerate(tl.keys):
         r0 = first_rank.get(key, n_rows + 6)
-        y0 = n_rows - 1 - min(r0 - 1, n_rows + 5)
+        y0 = max(-1.2, n_rows - r0)          # 화면 밖에서 멀리 시작하지 않게
         base = pal[min(i, n_rows - 1)]
         glow, = ax.plot([0, 0], [y0, y0], lw=bar_lw * 1.45, color=GOLD,
                         solid_capstyle="round", zorder=2, alpha=0)
@@ -448,11 +453,12 @@ def render(args) -> dict:
         # 왕관 배너가 뜨는 동안은 날짜 티커를 잠시 가린다.
         tick_bg.set_alpha(1.0 - crown_p)
         tick_txt.set_alpha(1.0 - crown_p)
+        tick_halo.set_alpha(tick_halo.get_alpha() * (1.0 - crown_p))
 
         # 스프링으로 y 이동(살짝 튀어 오르는 느낌)
         for key in tl.keys:
             r = rank_of.get(key)
-            target = (n_rows - r) if r else -1.9
+            target = (n_rows - r) if r else -1.2
             acc = (target - y_cur[key]) * SPRING_K - y_vel[key] * SPRING_D
             y_vel[key] = max(-MAX_VEL, min(MAX_VEL, y_vel[key] + acc * dt_frame))
             y_cur[key] = y_cur[key] + y_vel[key] * dt_frame
@@ -474,7 +480,8 @@ def render(args) -> dict:
             flash = max(0.0, min(1.0, (flash_until.get(key, -99.0) - t) / FLASH_SEC))
             if t > crown_until - CROWN_SEC + 0.35 and top1 == key:
                 flash = max(flash, crown_p)
-            color = blend(base_color[key], GOLD, 0.9 * flash)
+            # 막대 자체는 색을 유지하고(글자가 읽히게) 뒤에 금색 빛무리를 띄운다.
+            color = blend(base_color[key], GOLD, 0.20 * flash)
 
             bars[key].set_data([0, max(v, 0.0)], [y, y])
             bars[key].set_color(color)
@@ -494,17 +501,16 @@ def render(args) -> dict:
             subs[key].set_position((max_val * 0.010, y - 0.120))
             subs[key].set_text(fit_text(artist, avail, SUBLABEL_PT))
             subs[key].set_alpha(a * 0.85)
-            # 금색으로 빛나는 동안은 글자를 어둡게 바꿔 읽히게 한다.
-            hot = flash > 0.42
-            titles[key].set_color("#241604" if hot else TEXT)
-            subs[key].set_color("#3A2708" if hot else SUB)
+            # 글자 색은 항상 밝게 유지(금색 빛무리 위에서도 읽히게)
+            titles[key].set_color(TEXT)
+            subs[key].set_color(SUB)
 
             val_x = (v - max_val * 0.030) if inside else (v + max_val * 0.095)
             values[key].set_position((val_x, y))
             values[key].set_horizontalalignment("right" if inside else "left")
-            values[key].set_text(fmt(v) if v > 0 else "")
+            values[key].set_text(fmt(v) if (v > 0 and a > 0.4) else "")
             values[key].set_alpha(a)
-            values[key].set_color("#241604" if hot else ("#FFE9A8" if flash > 0.15 else "#FFFFFF"))
+            values[key].set_color("#FFE9A8" if flash > 0.12 else "#FFFFFF")
 
             _x, y_px = ax.transData.transform((0, y))
             fi = thumbs.get(key)
@@ -539,10 +545,11 @@ def render(args) -> dict:
             tick_txt.set_text(f"{_fmt_date(tl.dates[day_idx].isoformat(), cfg['date_fmt'])}"
                               f"   ·   {day_idx + 1}/{total_days}")
         pulse_p = max(0.0, min(1.0, (tick_pulse_until - t) / 0.75))
-        tick_bg.set_facecolor(blend((0.141, 0.106, 0.227, 1.0), GOLD, 0.92 * pulse_p))
-        tick_bg.set_edgecolor(blend((0.298, 0.227, 0.478, 1.0), (1.0, 0.87, 0.45, 1.0), pulse_p))
-        tick_txt.set_color(blend((1.0, 1.0, 1.0, 1.0), (0.10, 0.07, 0.0, 1.0), pulse_p))
-        tick_txt.set_fontsize(17 + 3.0 * pulse_p)
+        tick_halo.set_alpha(0.55 * pulse_p)
+        tick_bg.set_edgecolor(blend((0.298, 0.227, 0.478, 1.0), (1.0, 0.85, 0.40, 1.0), pulse_p))
+        tick_bg.set_linewidth(1.2 + 2.0 * pulse_p)
+        tick_txt.set_fontsize(17 + 3.4 * pulse_p)
+        tick_txt.set_color(blend((1.0, 1.0, 1.0, 1.0), (1.0, 0.92, 0.62, 1.0), pulse_p))
 
         if i < render_from:
             continue

@@ -17,7 +17,7 @@
 
 ```
 ┌ 스포티파이 주간 차트 ─┐   ┌ 영상 렌더 ─┐   ┌ 오디오 전환 ─┐   ┌ 업로드 ─┐
-│ kworb.net 13개국      │─▶│ matplotlib │─▶│ iTunes 30초  │─▶│ YouTube │
+│ kworb.net 14개국      │─▶│ matplotlib │─▶│ iTunes 30초  │─▶│ YouTube │
 │ data/{국가}_weekly.csv │   │ + ffmpeg   │   │ 미리듣기 교체 │   │ + 재생목록│
 └───────────────────────┘   └───────────┘   └─────────────┘   └────────┘
 ```
@@ -44,7 +44,7 @@
 
 ```
 config/
-  countries.json        13개 시장 설정(순서·표기·언어·재생목록 이름)
+  countries.json        14개 시장 설정(순서·표기·언어·재생목록 이름)
   playlists.json        나라별 유튜브 재생목록 ID (ensure_playlists.py가 채움)
 scripts/
   chart_config.py       설정 로더 · CSV 경로
@@ -56,7 +56,7 @@ scripts/
   build_audio.py        1위 곡 구간별 배경 음악 편집 + 영상에 합치기
   locales.py            11개 언어 제목·설명·해시태그·영상 문구
   upload_youtube.py     업로드 + 나라별 재생목록 + 중복 방지
-  ensure_playlists.py   13개국 재생목록 생성/확인 → config/playlists.json
+  ensure_playlists.py   14개국 재생목록 생성/확인 → config/playlists.json
   make_short.py         위 과정을 한 번에 실행
   get_youtube_token.py  업로드·재생목록용 OAuth 토큰 발급 도우미
 data/                   시점별 차트 스냅샷 CSV (자동 커밋)
@@ -74,7 +74,7 @@ pip install -r requirements.txt
 
 python scripts/make_short.py --period weekly --country kr      # 한국 주간 차트
 python scripts/make_short.py --period weekly --country global  # 글로벌
-python scripts/make_short.py --period weekly --country all     # 13개국 전부(오래 걸림)
+python scripts/make_short.py --period weekly --country all     # 14개국 전부(오래 걸림)
 python scripts/make_short.py --period daily  --country kr,us   # 일간 차트도 가능
 ```
 
@@ -84,7 +84,7 @@ python scripts/make_short.py --period daily  --country kr,us   # 일간 차트�
 
 | 옵션 | 기본값 | 설명 |
 |---|---|---|
-| `--country` | auto | `auto`(순번) · `all`(13개국) · `kr,us` 처럼 목록 · 코드 하나 |
+| `--country` | auto | `auto`(순번) · `all`(14개국) · `kr,us` 처럼 목록 · 코드 하나 |
 | `--period` | weekly | `weekly`(주간) / `daily`(일간) |
 | `--top` | 10 | 화면에 띄울 곡 수 |
 | `--duration` | 45(주간)·30(일간) | 영상 길이(초) |
@@ -148,29 +148,49 @@ python scripts/get_youtube_token.py --client-secret youtube_client_secret.json \
 # → 출력된 JSON 한 줄을 GitHub Secrets 의 YOUTUBE_TOKEN_JSON 에 덮어쓰기
 ```
 
-## GitHub Actions 자동 실행
+## 자동 실행 (운영은 Pickle 예약 작업)
 
-`.github/workflows/weekly-chart.yml` 이 매일 **00:00 UTC(09:00 KST)** 와
-**10:00 UTC(19:00 KST)** 에 아래를 수행한다.
+실제 매일 업로드는 **Pickle 예약 작업**(09:00 · 19:00 KST)이 담당한다.
+한 번의 실행은 아래 순서로 돌고, 각 단계가 2분 안팎이라 나눠져 있다.
+
+```
+cd /workspace/downloads/sori-play-chart-shorts
+export YOUTUBE_TOKEN_JSON="$(cat /workspace/downloads/youtube_token.json)"
+export YOUTUBE_CLIENT_SECRET_JSON="$(cat /workspace/downloads/youtube_client_secret.json)"
+python3 scripts/slot_pipeline.py prepare --period weekly --country auto
+python3 scripts/slot_pipeline.py chunk --index 0
+python3 scripts/slot_pipeline.py chunk --index 1
+python3 scripts/slot_pipeline.py chunk --index 2
+python3 scripts/slot_pipeline.py finish
+python3 scripts/upload_youtube.py --summary output/summary.json
+```
+
+순서·보고 규칙은 `scheduled-actions/🎬-14개국-주간-차트-쇼츠-자동-업로드/action.md` 에 있다.
+
+### GitHub Actions (선택 · 백업용)
+
+`.github/workflows/weekly-chart.yml` 은 같은 일을 GitHub에서 돌리는 백업 워크플로다.
+저장소에 워크플로를 쓰려면 Pickle GitHub 앱에 **Workflows / Secrets** 권한이 필요해,
+현재는 올라가 있지 않다(그대로 두는 것을 권장 — 두 곳에서 돌면 같은 나라가 두 번 올라간다).
 
 1. `ffmpeg` · 다국어 폰트(`fonts-noto-cjk`, `fonts-noto-core`, `fonts-nanum`, `fonts-thai-tlwg`) 설치
-2. 오늘 차례 국가 계산(`rotation.py`) — 일요일 19:00 은 올릴 칸이 없어 그냥 끝난다
+2. 오늘 차례 국가 계산(`rotation.py`) — 매일 두 칸이라 항상 한 나라가 정해진다
 3. 차트 수집 → 영상 렌더 → 오디오 전환
 4. `data/*.csv` · `state/uploads.json` 을 저장소에 커밋
 5. `output/*.mp4` 를 **artifact** 로 업로드
 6. `YOUTUBE_TOKEN_JSON` 이 있으면 업로드 + 재생목록 추가
    (같은 주·같은 나라를 이미 올렸으면 건너뛴다 — `--force` 로 무시)
 
-수동 실행: Actions 탭 → *13-Market Weekly Chart Shorts* → **Run workflow**
+수동 실행: Actions 탭 → *14-Market Weekly Chart Shorts* → **Run workflow**
 
 | 입력 | 설명 |
 |---|---|
-| `country` | `auto`(순번) · `all`(13개국) · `kr,us` 처럼 목록 |
+| `country` | `auto`(순번) · `all`(14개국) · `kr,us` 처럼 목록 |
 | `period` | `weekly` / `daily` |
 | `audio` | `preview` / `silent` / `off` |
 | `upload` | `auto`(공개) · `skip`(올리지 않음) · `unlisted`(미공개 테스트) |
 | `force_upload` | 같은 주·같은 나라도 다시 업로드 |
-| `setup_playlists` | 13개국 재생목록 생성/확인 실행 |
+| `setup_playlists` | 14개국 재생목록 생성/확인 실행 |
 
 ### 필요한 Secret / Variable
 
