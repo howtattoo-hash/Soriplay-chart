@@ -218,8 +218,8 @@ def update_country(country: str, period: str = "weekly", data_dir: str = "data",
     print(f"[{country}/{period}] {chart_date} 차트 {len(rows)}곡 수집 ({cfg['name_en']}, 1위: "
           f"{rows[0]['artist']} - {rows[0]['title']}, {rows[0]['streams'] or 0:,}회)")
     if not any((r.get("streams") or 0) > 0 for r in rows):
-        print(f"[{country}/{period}] 경고: 이 시장은 kworb가 스트림 수치를 주지 않습니다"
-              f"(모든 값 0). 순위만 있어 바 차트를 만들 수 없습니다.", file=sys.stderr)
+        print(f"[{country}/{period}] 알림: 이 시장은 kworb가 스트림 수치를 주지 않습니다(전부 0). "
+              f"순위 점수(Chart Score) 모드로 렌더합니다.", file=sys.stderr)
     hist = append_snapshot(hist, rows, country, chart_date, "kworb")
 
     if backfill:

@@ -220,13 +220,24 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
     dates = [d for d in (meta.get("dates") or []) if d]
     last = dt.date.fromisoformat(dates[-1]) if dates else dt.date.today()
     if period == "weekly":
-        week = (f"{last.strftime(cfg['week_fmt'])}–"
-                f"{(last + dt.timedelta(days=6)).strftime(cfg['week_fmt'])}")
+        # 주간 차트는 “하루”가 아니라 7일 범위로 표시한다(11.12–11.18).
+        try:
+            start = dt.date.fromisoformat(meta.get("week_start") or dates[0])
+            end = dt.date.fromisoformat(meta.get("week_end") or "")
+        except ValueError:
+            start, end = last, last + dt.timedelta(days=6)
+        if end <= start:
+            end = start + dt.timedelta(days=6)
+        week = f"{start.strftime(cfg['week_fmt'])}–{end.strftime(cfg['week_fmt'])}"
+        date_label = week
     else:
+        date_label = last.strftime(cfg["date_fmt"])
         week = last.strftime(cfg["week_fmt"])
 
     labels = meta.get("labels") or {}
     series = meta.get("series") or {}
+    metric = meta.get("metric", "streams")
+    unit = " pt" if metric == "score" else ""
     ranked = sorted(((k, v[-1]) for k, v in series.items() if v), key=lambda kv: -kv[1])
     n = min(top_n, len(ranked)) or top_n
 
@@ -238,7 +249,8 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
     a2 = _short(artist_of(ranked[1][0])) if len(ranked) > 1 else ""
 
     ctx = dict(a1=a1, a2=a2, market=cfg["market"], pw=pw, pw_cap=pw_cap, n=n,
-               date=last.strftime(cfg["date_fmt"]), week=week,
+               date=date_label, week=week,
+               metric=locales.metric_word(cfg["lang"], meta.get("metric", "streams")),
                playstore=locales.PLAYSTORE, site=locales.SITE)
 
     title = _clean_title(loc["title"].format(**ctx))
@@ -251,7 +263,7 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
     for i, (key, val) in enumerate(ranked[:5], 1):
         label = labels.get(key) or [key, ""]
         artist, song = (label[0], label[1]) if isinstance(label, list) and len(label) > 1 else (label[0], "")
-        lines.append(f"{i}. {artist} — {song} · {val:,}")
+        lines.append(f"{i}. {artist} — {song} · {val:,}{unit}")
     lines += [
         "",
         loc["cta"],
@@ -259,8 +271,10 @@ def build_metadata(meta: dict, period: str = "", top_n: int = 10) -> tuple[str, 
         loc["web"].format(site=locales.SITE),
         "",
         loc["note"].format(**ctx),
-        "",
     ]
+    if meta.get("metric") == "score":
+        lines += [locales.score_note(cfg["lang"])]
+    lines += [""]
 
     # 해시태그: 제목에 이미 있는 것(#Shorts)까지 합쳐 5개 이하
     used = len(_hashtags(title))

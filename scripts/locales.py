@@ -23,7 +23,8 @@ LOCALES: dict[str, dict] = {
     "ko": {
         "period_word": {"weekly": ("주간", "주간"), "daily": ("일간", "일간")},
         "title": "{a1}·{a2} | 스포티파이 {market} {pw} 차트 TOP {n} ({date}) #Shorts",
-        "desc_head": "스포티파이 {market} {pw} 차트 · {week} · 스트리밍 TOP {n}",
+        "desc_head": "스포티파이 {market} {pw} 차트 · {week} · {metric} TOP {n}",
+        "metric_phrase": {"streams": "스트리밍", "score": "순위 점수"},
         "top_head": "[{pw} TOP 5]",
         "cta": "Sori Play에서 이 곡들을 지금 무료로 들어보세요.",
         "store": "▶ Google Play: {playstore}",
@@ -35,11 +36,14 @@ LOCALES: dict[str, dict] = {
             "cta": "▶   지금 무료 감상 · Sori Play",
             "footer": "데이터 Spotify {pw} 차트 · 매일 자동 업데이트",
         },
+        "score_badge": "차트 점수",
+        "score_note": "스트림 수치를 공개하지 않는 차트라 순위 점수(1위 = 100)로 표시합니다.",
     },
     "en": {
         "period_word": {"weekly": ("weekly", "Weekly"), "daily": ("daily", "Daily")},
         "title": "{a1} & {a2} — Spotify {market} {pw_cap} Chart Top {n} ({date}) #Shorts",
-        "desc_head": "Spotify {market} {pw_cap} Chart — Top {n} by streams · {week}",
+        "desc_head": "Spotify {market} {pw_cap} Chart — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "by streams", "score": "by chart score"},
         "top_head": "[{pw_cap} Top 5]",
         "cta": "Listen to these free on Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -51,11 +55,13 @@ LOCALES: dict[str, dict] = {
             "cta": "▶   Listen free · Sori Play",
             "footer": "Data: Spotify {pw} chart · updated daily",
         },
+        "score_note": "This chart does not publish stream counts, so the bars show a rank score (No.1 = 100).",
     },
     "pt": {
         "period_word": {"weekly": ("semanal", "Semanal"), "daily": ("diário", "Diário")},
         "title": "{a1} e {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Parada {pw} da Spotify {market} — Top {n} por streams · {week}",
+        "desc_head": "Parada {pw} da Spotify {market} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "por streams", "score": "por pontuação do chart"},
         "top_head": "[Top 5 da semana]",
         "cta": "Ouça tudo de graça no Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -71,7 +77,8 @@ LOCALES: dict[str, dict] = {
     "es": {
         "period_word": {"weekly": ("semanal", "Semanal"), "daily": ("diario", "Diario")},
         "title": "{a1} y {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Top {n} {pw} de Spotify {market} por reproducciones · {week}",
+        "desc_head": "Top {n} {pw} de Spotify {market} {metric} · {week}",
+        "metric_phrase": {"streams": "por reproducciones", "score": "por puntuación del chart"},
         "top_head": "[Top 5 de la semana]",
         "cta": "Escúchalas gratis en Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -87,7 +94,8 @@ LOCALES: dict[str, dict] = {
     "id": {
         "period_word": {"weekly": ("mingguan", "Mingguan"), "daily": ("harian", "Harian")},
         "title": "{a1} & {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Tangga lagu {pw} Spotify {market} — Top {n} berdasarkan streaming · {week}",
+        "desc_head": "Tangga lagu {pw} Spotify {market} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "berdasarkan streaming", "score": "berdasarkan skor chart"},
         "top_head": "[Top 5 pekan ini]",
         "cta": "Dengarkan semuanya gratis di Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -103,7 +111,8 @@ LOCALES: dict[str, dict] = {
     "vi": {
         "period_word": {"weekly": ("tuần", "Tuần"), "daily": ("ngày", "Ngày")},
         "title": "{a1} & {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Bảng xếp hạng {pw} Spotify {market} — Top {n} theo lượt stream · {week}",
+        "desc_head": "Bảng xếp hạng {pw} Spotify {market} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "theo lượt stream", "score": "theo điểm xếp hạng"},
         "top_head": "[Top 5 tuần này]",
         "cta": "Nghe miễn phí tất cả trên Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -119,7 +128,8 @@ LOCALES: dict[str, dict] = {
     "th": {
         "period_word": {"weekly": ("รายสัปดาห์", "รายสัปดาห์"), "daily": ("รายวัน", "รายวัน")},
         "title": "{a1} & {a2} — Top {n} Spotify {market} ({pw} {date}) #Shorts",
-        "desc_head": "ชาร์ต Spotify {market} {pw} — Top {n} จากการสตรีม · {week}",
+        "desc_head": "ชาร์ต Spotify {market} {pw} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "จากการสตรีม", "score": "ตามคะแนนอันดับ"},
         "top_head": "[Top 5 สัปดาห์นี้]",
         "cta": "ฟังทั้งหมดได้ฟรีที่ Sori Play",
         "store": "▶ Google Play: {playstore}",
@@ -135,7 +145,8 @@ LOCALES: dict[str, dict] = {
     "fil": {
         "period_word": {"weekly": ("lingguhan", "Lingguhan"), "daily": ("araw-araw", "Araw-araw")},
         "title": "{a1} at {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Spotify {market} — Top {n} ayon sa streams · {week}",
+        "desc_head": "Spotify {market} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "ayon sa streams", "score": "ayon sa chart score"},
         "top_head": "[Top 5 ngayong linggo]",
         "cta": "Pakinggan silang lahat nang libre sa Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -151,7 +162,8 @@ LOCALES: dict[str, dict] = {
     "ms": {
         "period_word": {"weekly": ("mingguan", "Mingguan"), "daily": ("harian", "Harian")},
         "title": "{a1} & {a2} — Top {n} Spotify {market} ({pw_cap} {date}) #Shorts",
-        "desc_head": "Carta {pw} Spotify {market} — Top {n} mengikut strim · {week}",
+        "desc_head": "Carta {pw} Spotify {market} — Top {n} {metric} · {week}",
+        "metric_phrase": {"streams": "mengikut strim", "score": "mengikut skor carta"},
         "top_head": "[Top 5 minggu ini]",
         "cta": "Dengar semuanya percuma di Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -167,7 +179,8 @@ LOCALES: dict[str, dict] = {
     "ar": {
         "period_word": {"weekly": ("الأسبوعي", "الأسبوعي"), "daily": ("اليومي", "اليومي")},
         "title": "{a1} و{a2} — توب {n} سبوتيفاي {market} ({pw} {date}) #Shorts",
-        "desc_head": "قائمة سبوتيفاي {market} {pw} — أفضل {n} حسب عدد الاستماعات · {week}",
+        "desc_head": "قائمة سبوتيفاي {market} {pw} — أفضل {n} {metric} · {week}",
+        "metric_phrase": {"streams": "حسب عدد الاستماعات", "score": "حسب نقاط الترتيب"},
         "top_head": "[أفضل 5 هذا الأسبوع]",
         "cta": "استمع إليها مجانًا على Sori Play.",
         "store": "▶ Google Play: {playstore}",
@@ -183,7 +196,8 @@ LOCALES: dict[str, dict] = {
     "hi": {
         "period_word": {"weekly": ("साप्ताहिक", "साप्ताहिक"), "daily": ("दैनिक", "दैनिक")},
         "title": "{a1} और {a2} — Spotify {market} {pw} टॉप {n} ({date}) #Shorts",
-        "desc_head": "Spotify {market} का {pw} चार्ट — स्ट्रीम्स के आधार पर टॉप {n} · {week}",
+        "desc_head": "Spotify {market} का {pw} चार्ट — टॉप {n} {metric} · {week}",
+        "metric_phrase": {"streams": "स्ट्रीम्स के आधार पर", "score": "रैंक स्कोर के आधार पर"},
         "top_head": "[इस हफ़्ते के टॉप 5]",
         "cta": "इन्हें Sori Play पर मुफ़्त सुनें।",
         "store": "▶ Google Play: {playstore}",
@@ -195,6 +209,26 @@ LOCALES: dict[str, dict] = {
             "cta": "▶   मुफ़्त सुनें · Sori Play",
             "footer": "डेटा: Spotify {pw} चार्ट · रोज़ अपडेट",
         },
+        "score_note": "यह चार्ट स्ट्रीम संख्या नहीं दिखाता, इसलिए बार में रैंक स्कोर (1 = सबसे ऊपर) दिखाया गया है।",
+    },
+    "tr": {
+        "period_word": {"weekly": ("haftalık", "Haftalık"), "daily": ("günlük", "Günlük")},
+        "title": "{a1} & {a2} — Spotify {market} {pw_cap} Liste • İlk {n} ({date}) #Shorts",
+        "desc_head": "Spotify {market} {pw_cap} Liste — {metric} ilk {n} · {week}",
+        "metric_phrase": {"streams": "akış sayısına göre", "score": "sıralama puanına göre"},
+        "top_head": "[Bu haftanın ilk 5'i]",
+        "cta": "Hepsini Sori Play'de ücretsiz dinleyin.",
+        "store": "▶ Google Play: {playstore}",
+        "web": "▶ Web'de dinle: {site}",
+        "note": "Her gün iki ülke — haftada 14 liste, 09:00 ve 19:00 (KST).",
+        "hashtags": ["#SoriPlay", "#SpotifyTürkiye", "#TürkçeMüzik", "#HaftalıkListe"],
+        "video": {
+            "chart": "Spotify {market} · {pw_cap} Liste",
+            "cta": "▶   Ücretsiz dinle · Sori Play",
+            "footer": "Veri: Spotify {pw} liste · her gün güncellenir",
+        },
+        "score_badge": "SIRALAMA PUANI",
+        "score_note": "Bu liste akış sayısı yayınlamadığı için çubuklar sıralama puanını gösterir (1. = 100).",
     },
 }
 
@@ -208,3 +242,20 @@ def period_words(lang: str, period: str) -> tuple[str, str]:
     """(소문자형, 대문자형) 기간 단어."""
     loc = get(lang)
     return loc["period_word"].get(period, loc["period_word"]["weekly"])
+
+
+def metric_word(lang: str, metric: str = "streams") -> str:
+    """설명에 쓰는 “스트림 기준 / 순위 점수 기준” 문구."""
+    loc = get(lang)
+    phrases = loc.get("metric_phrase") or LOCALES["en"]["metric_phrase"]
+    return phrases.get(metric, phrases["streams"])
+
+
+def score_badge(lang: str) -> str:
+    """스트림 수치가 없는 차트에서 쓰는 상단 배지 문구."""
+    return get(lang).get("score_badge") or "CHART SCORE"
+
+
+def score_note(lang: str) -> str:
+    """설명 끝에 붙이는 “순위 점수” 안내."""
+    return get(lang).get("score_note") or get("en")["score_note"]

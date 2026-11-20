@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import datetime as dt
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -26,6 +27,8 @@ REQUIRED_COLUMNS = ["chart_date", "country", "rank", "artist", "title", "streams
 # 곡별 보간 곡선 파라미터 범위
 K_RANGE = (0.55, 1.90)      # 작을수록 초반에 몰아 오름, 클수록 막판에 치고 올라옴
 AMP_RANGE = (0.015, 0.075)  # 구간 중간의 출렁임(추월을 여러 번 만들기 위한 작은 진폭)
+HOLD_FRAC = 0.62            # 한 칸 안에서 이 비율까지 값이 차고, 남은 구간은 버틴다(비트감)
+WEEK_DAYS = 7               # 주간 차트를 요일 7칸으로 펼친다
 
 
 def track_key(artist: str, title: str) -> str:
@@ -46,18 +49,40 @@ def curve_params(key: str) -> tuple[float, float, float]:
     return k, amp, phase
 
 
+def week_shape(key: str) -> np.ndarray:
+    """곡별 7일 누적 비중(첫날…마지막날). 그 주 합계를 요일별로 쌓는 모양이다.
+
+    곡마다 정점 요일이 달라서, 어떤 곡은 초반에 치고 나가고 어떤 곡은 막판에
+    몰아치면서 영상 중간에 1위가 여러 번 바뀐다. 마지막 값은 정확히 1.0.
+    """
+    h = hashlib.sha1(key.encode("utf-8")).digest()
+    peak = 1 + (h[3] % WEEK_DAYS)              # 1~7일쨤 정점
+    sharp = 1.05 + (h[4] / 255.0) * 1.45       # 정점 폭
+    days = np.arange(1, WEEK_DAYS + 1, dtype=float)
+    w = np.exp(-((days - peak) ** 2) / (2.0 * sharp ** 2))
+    total = w.sum()
+    if total <= 0:
+        w = np.ones_like(w)
+        total = w.sum()
+    return np.cumsum(w / total)
+
+
 def ease_vector(u: np.ndarray, k: np.ndarray, amp: np.ndarray,
                 phase: np.ndarray) -> np.ndarray:
-    """구간 진행도 u(0~1)에서 곡별로 다른 성장 곡선. u=0 → 0, u=1 → 1 보장."""
+    """구간 진행도 u(0~1)에서 곡별로 다른 성장 곡선. u=0 → 0, u=1 → 1 보장.
+
+    앞 62%에서 값이 차고 나머지는 버티는 리듬(hold-and-surge)을 준다.
+    """
     u = np.clip(u, 0.0, 1.0)
+    q = np.clip(u / HOLD_FRAC, 0.0, 1.0)
     with np.errstate(invalid="ignore", divide="ignore"):
-        a = np.power(u, k)
-        b = np.power(1.0 - u, k)
-        s = np.where((a + b) > 0, a / (a + b), u)
-    s = np.where(u <= 0.0, 0.0, np.where(u >= 1.0, 1.0, s))
+        a = np.power(q, k)
+        b = np.power(1.0 - q, k)
+        s = np.where((a + b) > 0, a / (a + b), q)
+    s = np.where(q <= 0.0, 0.0, np.where(q >= 1.0, 1.0, s))
     wave = amp * np.sin(np.pi * u) * np.sin(2.0 * np.pi * u + phase)
     wave = np.where((u <= 0.0) | (u >= 1.0), 0.0, wave)
-    return s + wave
+    return np.clip(s + wave, 0.0, 1.08)
 
 
 def load_history(path: str, max_days: int = 7) -> pd.DataFrame:
@@ -94,6 +119,7 @@ class Timeline:
     duration: float = 45.0
     fps: int = 30
     top_n: int = 10
+    metric: str = "streams"          # streams / score (스트림 비공개 차트)
     official_change: dict = field(default_factory=dict)   # key -> '+7' / '-1' / 'NEW' …
     frames: int = field(init=False)
 
@@ -120,18 +146,31 @@ class Timeline:
         return u * (self.n_dates - 1)
 
     def date_label(self, i_frame: int) -> str:
-        """보간된 날짜 라벨 (진행 바 표시용)."""
-        u = self.progress(i_frame)
+        """지금 화면이 보여주는 차트 시점(요일/주). 막대가 그 칸의 값을 다 채우면 넘어간다."""
         if self.n_dates == 1:
             return self.dates[0].isoformat()
-        i = min(int(round(u * (self.n_dates - 1))), self.n_dates - 1)
-        return self.dates[i].isoformat()
+        pos = self._pos(i_frame)
+        idx = int(math.floor(pos - HOLD_FRAC)) + 1
+        idx = min(max(idx, 0), self.n_dates - 1)
+        return self.dates[idx].isoformat()
+
+    def day_index(self, i_frame: int) -> int:
+        """지금 몇 번째 시점을 보여주는지(0부터). 날짜 표시가 바뀌는 순간을 잡는 데 쓴다."""
+        if self.n_dates == 1:
+            return 0
+        pos = self._pos(i_frame)
+        idx = int(math.floor(pos - HOLD_FRAC)) + 1
+        return min(max(idx, 0), self.n_dates - 1)
 
     # --- 프레임별 값 ---------------------------------------------------------
     def values_at(self, i_frame: int) -> np.ndarray:
         pos = self._pos(i_frame)
         if self.n_dates == 1:
-            return self.values[0].astype(float)
+            # 시점이 하나뿐이면(예: 인도 주간) 0에서 최종값까지 곡별 곡선으로 차오르게 한다.
+            u = self.progress(i_frame)
+            ease = ease_vector(np.full(len(self.keys), u), self.curve_k,
+                               self.curve_amp, self.curve_phase)
+            return self.values[0].astype(float) * ease
         k = min(int(math.floor(pos)), self.n_dates - 2)
         frac = pos - k
         a = self.values[k].astype(float)
@@ -195,9 +234,12 @@ class Timeline:
         return {
             "country": self.country,
             "dates": [d.isoformat() for d in self.dates],
+            "week_start": self.dates[0].isoformat(),
+            "week_end": self.dates[-1].isoformat(),
             "duration": self.duration,
             "fps": self.fps,
             "top_n": self.top_n,
+            "metric": self.metric,
             "keys": self.keys,
             "labels": {k: list(v) for k, v in self.labels.items()},
             "series": {k: [int(x) for x in self.values[:, i]] for i, k in enumerate(self.keys)},
@@ -207,7 +249,7 @@ class Timeline:
 
 def build_timeline(df: pd.DataFrame, country: str, top_n: int = 10,
                    duration: float = 45.0, fps: int = 30,
-                   extra_keys: int = 6) -> Timeline:
+                   extra_keys: int = 6, period: str = "weekly") -> Timeline:
     """정리된 히스토리로 Timeline을 만든다."""
     if df.empty:
         raise SystemExit("차트 데이터가 비어 있습니다. fetch_spotify.py를 먼저 실행하세요.")
@@ -265,6 +307,36 @@ def build_timeline(df: pd.DataFrame, country: str, top_n: int = 10,
                 val = f"+{num}" if num > 0 else str(num)
             official[row["key"]] = val
 
+    # 스트림 수치가 전혀 없는 차트(예: 인도)는 순위 점수로 바를 만든다.
+    metric = "streams"
+    if values.max() <= 0:
+        metric = "score"
+        scored = np.zeros(values.shape, dtype=float)
+        for j in range(values.shape[0]):
+            row = ranks[j]
+            known = row < 10 ** 6
+            n_chart = int(known.sum())
+            if n_chart:
+                # 1위 = 100점 … 꼴등 = 100/N 점
+                scored[j, known] = (n_chart - row[known] + 1) / n_chart * 100.0
+        values = np.round(scored).astype(np.int64)
+
+    # 주간 차트: 최신 주의 합계를 7일치로 펼처서 날짜가 하루씩 흐르는 레이스를 만든다.
+    if period == "weekly" and len(dates) >= 1:
+        last_date = dates[-1]
+        totals = values[-1].astype(float)
+        week_values = np.zeros((WEEK_DAYS, len(keys)), dtype=np.int64)
+        for i, k in enumerate(keys):
+            shape = week_shape(k)
+            week_values[:, i] = np.round(totals[i] * shape).astype(np.int64)
+        week_values[-1, :] = values[-1]          # 마지막 날 = 그 주 합계 그대로
+        week_ranks = np.full(week_values.shape, 10 ** 6, dtype=np.int64)
+        for j in range(WEEK_DAYS):
+            for r, idx in enumerate(np.argsort(-week_values[j], kind="stable"), start=1):
+                week_ranks[j, idx] = r
+        dates = [last_date + dt.timedelta(days=k) for k in range(WEEK_DAYS)]
+        values, ranks = week_values, week_ranks
+
     return Timeline(country=country, dates=dates, keys=keys, labels=labels,
                     values=values, ranks=ranks, duration=duration,
-                    fps=fps, top_n=top_n, official_change=official)
+                    fps=fps, top_n=top_n, metric=metric, official_change=official)

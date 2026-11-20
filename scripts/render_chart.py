@@ -237,9 +237,11 @@ def render(args) -> dict:
     csv_path = chart_config.csv_path(args.data_dir, country, period)
     df = chart_data.load_history(csv_path, max_days=args.days)
     tl = chart_data.build_timeline(df, country, top_n=args.top, duration=args.duration,
-                                   fps=args.fps)
+                                   fps=args.fps, period=period)
     max_val = tl.max_value()
     n_rows = tl.top_n
+    is_score = (getattr(tl, "metric", "streams") == "score")
+    score_badge = locales.score_badge(cfg["video_lang"]) if is_score else ""
     os.makedirs(os.path.dirname(os.path.abspath(args.out)) or ".", exist_ok=True)
 
     # ---- 커버 아트 준비 -----------------------------------------------------
@@ -264,39 +266,52 @@ def render(args) -> dict:
     bg.imshow(grad, aspect="auto", extent=(0, 1, 0, 1), origin="upper", zorder=-10)
     bg.axis("off")
 
-    # 헤더
-    fig.text(0.070, 0.945, "Sori Play", color=TEXT, fontsize=27, fontweight="bold", va="center")
-    fig.text(0.250, 0.945, f"· {vtext['chart']}", color=DIM, fontsize=16, va="center")
-    fig.text(0.070, 0.906, f"TOP {n_rows}  ·  {cfg['label']}", color=ACCENT,
+    # 헤더 (차트 기간은 항상 7일 범위로 보여준다)
+    fig.text(0.070, 0.962, "Sori Play", color=TEXT, fontsize=26, fontweight="bold", va="center")
+    fig.text(0.250, 0.962, f"· {vtext['chart']}", color=DIM, fontsize=15, va="center")
+    fig.text(0.070, 0.928, f"TOP {n_rows}  ·  {cfg['label']}", color=ACCENT,
              fontsize=14, fontweight="bold", va="center")
-    last_date = tl.dates[-1]
-    fig.text(0.930, 0.906, last_date.strftime("%Y.%m.%d"), color=DIM,
-             fontsize=14, va="center", ha="right")
+    if is_score:
+        fig.text(0.395, 0.928, f"·  {score_badge}", color="#FBBF24",
+                 fontsize=12.5, fontweight="bold", va="center")
+    week_start, week_end = tl.dates[0], tl.dates[-1]
+    fig.text(0.930, 0.928,
+             f"{week_start.strftime(cfg['date_fmt'])} – {week_end.strftime(cfg['date_fmt'])}",
+             color=DIM, fontsize=13.5, va="center", ha="right")
 
-    # NEW #1 왕관 배너 (평소엔 투명)
-    crown_bg = FancyBboxPatch((0.058, 0.874), 0.884, 0.044,
-                              boxstyle="round,pad=0.004,rounding_size=0.020",
+    # 날짜 티커: 차트가 다음 날로 넘어갈 때마다 크게 튄다.
+    tick_bg = FancyBboxPatch((0.345, 0.874), 0.310, 0.038,
+                             boxstyle="round,pad=0.004,rounding_size=0.019",
+                             transform=fig.transFigure, facecolor="#241B3A",
+                             edgecolor="#4C3A7A", linewidth=1.2, alpha=1.0, zorder=12)
+    fig.patches.append(tick_bg)
+    tick_txt = fig.text(0.5, 0.893, "", color="#FFFFFF", fontsize=17,
+                        fontweight="bold", ha="center", va="center", zorder=13)
+
+    # NEW #1 왕관 배너 (날짜 티커와 같은 줄 · 왕관이 뜨는 동안 티커는 잠시 숨김)
+    crown_bg = FancyBboxPatch((0.058, 0.874), 0.884, 0.038,
+                              boxstyle="round,pad=0.004,rounding_size=0.019",
                               transform=fig.transFigure, facecolor=GOLD_HEX,
                               edgecolor="none", alpha=0.0, zorder=30)
     fig.patches.append(crown_bg)
-    crown_txt = fig.text(0.5, 0.896, "", color="#1A1207", fontsize=15.5,
+    crown_txt = fig.text(0.5, 0.893, "", color="#1A1207", fontsize=15,
                          fontweight="bold", ha="center", va="center", alpha=0.0, zorder=31)
 
     # 차트 영역 (왼쪽 거터: 순위 + 원형 커버)
-    ax = fig.add_axes([0.245, 0.150, 0.700, 0.720])
-    ax.set_xlim(0, max_val * 1.16)
+    ax = fig.add_axes([0.245, 0.150, 0.700, 0.700])
+    ax.set_xlim(0, max_val * 1.03)
     ax.set_ylim(-0.7, n_rows - 1 + 0.7)
     ax.axis("off")
     for frac in (0.25, 0.5, 0.75, 1.0):
         ax.axvline(max_val * frac, color="#FFFFFF", alpha=0.05, lw=1, zorder=0)
 
     pal = bar_palette(n_rows)
-    px_per_row = (0.720 * H) / (n_rows + 0.4)
+    px_per_row = (0.700 * H) / (n_rows + 0.4)
     bar_lw = BAR_H * px_per_row * 72.0 / fig.dpi   # 포인트 단위 막대 두께
-    bar_px_full = 0.700 * W                        # x축 1.16*max_val 이 차지하는 픽셀
+    bar_px_full = 0.700 * W                        # x축 1.03*max_val 이 차지하는 픽셀
 
     def val_to_px(v: float) -> float:
-        return v / (max_val * 1.16) * bar_px_full
+        return v / (max_val * 1.03) * bar_px_full
 
     bars, glows, titles, subs, values, thumbs, ranks, badges = {}, {}, {}, {}, {}, {}, {}, {}
     y_cur: dict[str, float] = {}
@@ -360,8 +375,8 @@ def render(args) -> dict:
     fig.patches.append(cta)
     fig.text(0.5, 0.0552, vtext["cta"], color="#FFFFFF",
              fontsize=15, fontweight="bold", ha="center", va="center", zorder=6)
-    fig.text(0.5, 0.017, vtext["footer"], color=FAINT,
-             fontsize=9.5, ha="center")
+    fig.text(0.5, 0.017, vtext["footer"] + (f" · {score_badge}" if is_score else ""),
+             color=FAINT, fontsize=9.5, ha="center")
 
     # ---- 인코더 -------------------------------------------------------------
     ffmpeg = find_ffmpeg()
@@ -390,6 +405,8 @@ def render(args) -> dict:
     crown_until = -99.0
     last_crown = -99.0
     prev_top1 = None
+    tick_day = -1
+    tick_pulse_until = -99.0
     base_color = {k: pal[min(i, n_rows - 1)] for i, k in enumerate(tl.keys)}
 
     # 프레임을 나눠 렌더할 때(--from-frame/--to-frame): 앞 구간은 상태만 진행하고 그리지 않는다.
@@ -428,6 +445,9 @@ def render(args) -> dict:
             crown_p = max(0.0, min(1.0, crown_p))
         crown_bg.set_alpha(1.0 * crown_p)
         crown_txt.set_alpha(crown_p)
+        # 왕관 배너가 뜨는 동안은 날짜 티커를 잠시 가린다.
+        tick_bg.set_alpha(1.0 - crown_p)
+        tick_txt.set_alpha(1.0 - crown_p)
 
         # 스프링으로 y 이동(살짝 튀어 오르는 느낌)
         for key in tl.keys:
@@ -464,7 +484,10 @@ def render(args) -> dict:
             glows[key].set_alpha(0.55 * flash * a)
 
             bar_px = val_to_px(v)
-            avail = bar_px - text_px("  ", LABEL_PT) - 8
+            inside = v > max_val * 0.74
+            # 막대 안에 숫자를 넣는 경우엔 그만큼 글자 자리를 빼서 겹치지 않게 한다.
+            val_space = text_px(fmt(v), VALUE_PT) + 42 if inside else 0
+            avail = bar_px - text_px("  ", LABEL_PT) - 22 - val_space
             titles[key].set_position((max_val * 0.010, y + 0.085))
             titles[key].set_text(fit_text(title, avail, LABEL_PT))
             titles[key].set_alpha(a)
@@ -476,7 +499,6 @@ def render(args) -> dict:
             titles[key].set_color("#241604" if hot else TEXT)
             subs[key].set_color("#3A2708" if hot else SUB)
 
-            inside = v > max_val * 0.74
             val_x = (v - max_val * 0.030) if inside else (v + max_val * 0.095)
             values[key].set_position((val_x, y))
             values[key].set_horizontalalignment("right" if inside else "left")
@@ -505,7 +527,22 @@ def render(args) -> dict:
         u = tl.progress(i)
         prog_fill.set_data([0, u], [0, 0])
         prog_dot.set_data([u], [0])
+        day_idx = tl.day_index(i)
         cur_date_txt.set_text(_fmt_date(tl.date_label(i), cfg["date_fmt"]))
+
+        # 날짜 티커: 날이 바뀌면 큰 글씨가 튀면서 금색으로 번쩍인다.
+        if day_idx != tick_day:
+            if tick_day >= 0:
+                tick_pulse_until = t + 0.75
+            tick_day = day_idx
+            total_days = tl.n_dates if tl.n_dates > 1 else 1
+            tick_txt.set_text(f"{_fmt_date(tl.dates[day_idx].isoformat(), cfg['date_fmt'])}"
+                              f"   ·   {day_idx + 1}/{total_days}")
+        pulse_p = max(0.0, min(1.0, (tick_pulse_until - t) / 0.75))
+        tick_bg.set_facecolor(blend((0.141, 0.106, 0.227, 1.0), GOLD, 0.92 * pulse_p))
+        tick_bg.set_edgecolor(blend((0.298, 0.227, 0.478, 1.0), (1.0, 0.87, 0.45, 1.0), pulse_p))
+        tick_txt.set_color(blend((1.0, 1.0, 1.0, 1.0), (0.10, 0.07, 0.0, 1.0), pulse_p))
+        tick_txt.set_fontsize(17 + 3.0 * pulse_p)
 
         if i < render_from:
             continue

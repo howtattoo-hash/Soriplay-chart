@@ -90,15 +90,10 @@ def main() -> None:
             continue
         chart_date = sorted(hist["chart_date"].unique())[-1]
         latest = hist[hist["chart_date"] == chart_date]
-        if latest["streams"].fillna(0).sum() <= 0:
-            # kworb가 스트림 수치를 주지 않는 시장(예: 인도)은 바 차트를 만들 수 없다.
-            print(f"[make_short] {country}: {chart_date} 스트림 수치가 없어(전부 0) 건너뜁니다. "
-                  f"config/countries.json 의 order 에서 이 시장을 빼거나 다른 시장으로 바꾸세요.",
-                  file=sys.stderr)
-            results.append({"country": country, "country_label": cfg["label"],
-                            "period": args.period, "chart_date": str(chart_date),
-                            "skipped": "no stream data in source"})
-            continue
+        score_mode = latest["streams"].fillna(0).sum() <= 0
+        if score_mode:
+            # 스트림 수치를 공개하지 않는 시장(예: 인도)은 순위 점수로 그린다(영상에 CHART SCORE 표시).
+            print(f"[make_short] {country}: 스트림 수치가 없어 순위 점수(Chart Score) 모드로 렌더합니다.")
         stem = (f"soriplay_spotify_{country}_{args.period}_"
                 f"{str(chart_date).replace('-', '')}")
         raw = os.path.join(args.out_dir, f"{stem}_raw.mp4")
@@ -142,6 +137,7 @@ def main() -> None:
             "timeline": timeline_path,
             "top1": info.get("top1"),
             "top2": top2,
+            "metric": info.get("metric", "streams"),
             "top1_changes": len(segs),
             "duration": info.get("duration"),
             "size_mb": round(os.path.getsize(final) / 1e6, 2) if os.path.exists(final) else 0,

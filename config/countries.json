@@ -1,6 +1,6 @@
 {
   "_comment": "스포티파이 주간 차트 쇼츠가 다루는 13개 시장. order 배열이 하루 두 곳씩 돌아가는 순서다(월 09:00부터). label은 영상 상단 배지, market은 유튜브 제목·설명에 쓰는 그 나라 말 이름, lang은 유튜브 문구 언어, video_lang은 영상 안 글자 언어(복잡 문자는 영어로 둔다).",
-  "order": ["global", "kr", "us", "gb", "br", "mx", "id", "vn", "th", "ph", "my", "sa", "in"],
+  "order": ["global", "kr", "us", "gb", "br", "mx", "id", "vn", "th", "ph", "my", "sa", "in", "tr"],
   "countries": {
     "global": {
       "label": "GLOBAL",
@@ -131,6 +131,16 @@
       "date_fmt": "%d/%m",
       "week_fmt": "%d.%m",
       "playlist": "🇮🇳 Spotify India Weekly Chart"
+    },
+    "tr": {
+      "label": "TÜRKİYE",
+      "market": "Türkiye",
+      "name_en": "Türkiye",
+      "lang": "tr",
+      "video_lang": "tr",
+      "date_fmt": "%d/%m",
+      "week_fmt": "%d.%m",
+      "playlist": "🇹🇷 Spotify Türkiye Weekly Chart"
     }
   }
 }
